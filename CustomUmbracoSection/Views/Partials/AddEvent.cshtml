@@ -1,0 +1,63 @@
+﻿@using EventCalendar.Models
+@model AddEventModel
+@using System.Web.Mvc.Html
+
+<form action="~/umbraco/EventCalendar/ECBackendSurface/AddEvent" enctype="multipart/form-data" method="post" class="form-horizontal">
+    <fieldset>
+    @Html.HiddenFor(x => x.calendarId)
+    <div class="control-group">
+        @Html.LabelFor(x => x.title, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.title)
+        </div>
+        @Html.ValidationMessageFor(x => x.title)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.allday, new { @class = "control-label" })
+        <div class="controls">
+            @Html.CheckBoxFor(x => x.allday)
+        </div>
+        @Html.ValidationMessageFor(x => x.allday)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.start, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.start, new { @readonly = "readonly", size = "16", @class = "form_datetime1" })
+        </div>
+        @Html.ValidationMessageFor(x => x.start)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.end, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.end, new { @readonly = "readonly", size = "16", @class = "form_datetime2" })
+        </div>
+        @Html.ValidationMessageFor(x => x.end)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.description, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextAreaFor(x => x.description)
+        </div>
+        @Html.ValidationMessageFor(x => x.description)
+    </div>
+    <div class="control-group">
+        <label for="LocationSearch" class="control-label">Location</label>
+        <div class="controls">
+            <fieldset class="gllpLatlonPicker">
+                <input type="text" class="gllpSearchField">
+		        <input type="button" class="gllpSearchButton" value="search">
+		        <br/><br/>
+		        <div class="gllpMap">Google Maps</div>
+                @Html.HiddenFor(x => x.lat, new { @class = "gllpLatitude" })
+                @Html.HiddenFor(x => x.lon, new { @class = "gllpLongitude" })
+		        <input type="hidden" class="gllpZoom" value="12"/>
+            </fieldset>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <input type="submit" value="Senden" class="btn btn-primary">
+        </div>
+    </div>
+    </fieldset>
+</form>

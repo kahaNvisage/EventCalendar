@@ -1,0 +1,60 @@
+﻿@model EventCalendar.Models.ECalendar
+@using System.Web.Mvc.Html
+
+@*using (Html.BeginUmbracoForm<EventCalendar.Controllers.ECBackendSurfaceController>("EditCalendar"))
+{
+    @Html.EditorFor(x => Model)
+    <input type="submit" value="Senden" />
+}*@
+
+@if (TempData["StatusSettings"] == "Invalid")
+{
+    <div class="alert alert-error">
+        Settings couldn't be saved due to errors!
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+    </div>
+}
+@if (TempData["StatusSettings"] == "Valid")
+{
+    <div class="alert alert-success">
+        Settings saved!
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+    </div>
+}
+
+<form action="http://localhost:33314/umbraco/EventCalendar/ECBackendSurface/EditCalendar" enctype="multipart/form-data" method="post" class="form-horizontal">
+    @Html.HiddenFor(x => x.Id)
+    <div class="control-group">
+        @Html.LabelFor(x => x.Calendarname, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.Calendarname)
+        </div>
+        @Html.ValidationMessageFor(x => x.Calendarname)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.IsGCal, new { @class = "control-label" })
+        <div class="controls">
+            @Html.CheckBoxFor(x => x.IsGCal)
+            @Html.HiddenFor(x => x.IsGCal)
+        </div>
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.GCalFeedUrl, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.GCalFeedUrl)
+        </div>
+        @Html.ValidationMessageFor(x => x.Calendarname)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.DisplayOnSite, new { @class = "control-label" })
+        <div class="controls">
+            @Html.CheckBoxFor(x => x.DisplayOnSite)
+            @Html.HiddenFor(x => x.DisplayOnSite)
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <input type="submit" value="Senden" class="btn btn-primary">
+        </div>
+    </div>
+</form>

@@ -1,0 +1,118 @@
+﻿@model EventCalendar.Models.EditEventModel
+@using System.Web.Mvc.Html
+@using System.Globalization
+
+<link type="text/css" href="@Url.Content("~/css/bootstrap.css")" rel="stylesheet" />
+<link type="text/css" href="@Url.Content("~/css/jquery-ui-1.10.2.custom.min.css")" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/css/jquery-gmaps-latlon-picker.css")"/>
+<script type="text/javascript" src="@Url.Content("~/scripts/jquery-1.9.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-1.10.2.custom.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-timepicker-addon.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-sliderAccess.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/jquery.validate.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/bootstrap.min.js")"></script>
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="@Url.Content("~/scripts/jquery-gmaps-latlon-picker.js")"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".alert").alert();
+        $('#myTab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        })
+        $(".form_datetime1").datetimepicker({ dateFormat: "yy-mm-dd" });
+        $(".form_datetime2").datetimepicker({ dateFormat: "yy-mm-dd" });
+    });
+</script>
+<style type="text/css">
+    /* css for timepicker */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+.ui-timepicker-rtl{ direction: rtl; }
+.ui-timepicker-rtl dl { text-align: right; }
+.ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
+</style>
+
+<h1>Edit Event</h1>
+
+@if (TempData["StatusEditEvent"] == "Invalid")
+{
+    <div class="alert alert-error">
+        Event couldn't be saved due to errors!
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+    </div>
+}
+@if (TempData["StatusEditEvent"] == "Valid")
+{
+    <div class="alert alert-success">
+        Event saved!
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+    </div>
+}
+
+<form action="~/umbraco/EventCalendar/ECBackendSurface/EditEventForm" enctype="multipart/form-data" method="post" class="form-horizontal">
+    <fieldset>
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.calendarId)
+    <div class="control-group">
+        @Html.LabelFor(x => x.title, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.title)
+        </div>
+        @Html.ValidationMessageFor(x => x.title)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.allday, new { @class = "control-label" })
+        <div class="controls">
+            @Html.CheckBoxFor(x => x.allday)
+        </div>
+        @Html.ValidationMessageFor(x => x.allday)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.start, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.start, new { @readonly = "readonly", size = "16", @class = "form_datetime1" })
+        </div>
+        @Html.ValidationMessageFor(x => x.start)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.end, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.end, new { @readonly = "readonly", size = "16", @class = "form_datetime2" })
+        </div>
+        @Html.ValidationMessageFor(x => x.end)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.description, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextAreaFor(x => x.description)
+        </div>
+        @Html.ValidationMessageFor(x => x.description)
+    </div>
+    <div class="control-group">
+        <label for="LocationSearch" class="control-label">Location</label>
+        <div class="controls">
+            <fieldset class="gllpLatlonPicker">
+                <input type="text" class="gllpSearchField">
+		        <input type="button" class="gllpSearchButton" value="search">
+		        <br/><br/>
+		        <div class="gllpMap">Google Maps</div>
+                @Html.HiddenFor(x => x.lat, new { @class = "gllpLatitude" })
+                @Html.HiddenFor(x => x.lon, new { @class = "gllpLongitude" })
+		        <input type="hidden" class="gllpZoom" value="12"/>
+            </fieldset>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <input type="submit" value="Senden" class="btn btn-primary">
+        </div>
+    </div>
+    </fieldset>
+</form>

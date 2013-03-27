@@ -1,0 +1,26 @@
+﻿@using EventCalendar.Models
+@model List<CalendarEntry>
+@using System.Web.Mvc.Html
+
+<table class="table table-striped table-condensed table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>AllDay</th>
+            <th>Start</th>
+            <th>End</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (CalendarEntry e in Model)
+        {
+            <tr>
+                <td><a href="~/umbraco/EventCalendar/ECBackendSurface/EditEventForm/?id=@e.Id">@e.title</a></td>
+                <td>@e.allDay</td>
+                <td>@e.start</td>
+                <td>@e.end</td>
+            </tr>
+        }
+    </tbody>
+<tfoot></tfoot>
+</table>
