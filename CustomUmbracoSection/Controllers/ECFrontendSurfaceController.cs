@@ -18,12 +18,18 @@ namespace EventCalendar.Controllers
         public ActionResult GetEventDetails(int id)
         {
             CalendarEntry e = ApplicationContext.DatabaseContext.Database.Single<CalendarEntry>("SELECT * FROM ec_events WHERE id=@0",id);
+            EventLocation l = null;
+            if (e.locationId != 0)
+            {
+                l = ApplicationContext.DatabaseContext.Database.Single<EventLocation>("SELECT * FROM ec_locations WHERE id = @0", e.locationId);
+            }
+
             EventDetailsModel evm = new EventDetailsModel()
             {
                 Title = e.title,
                 Description = e.description,
-                Latitude = e.lat,
-                Longitude = e.lon
+                LocationId = e.locationId,
+                Location = l
             };
             if (null != e.start)
             {

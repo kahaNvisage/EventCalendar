@@ -48,11 +48,30 @@ namespace EventCalendar
                 //Create Events table
                 try
                 {
-                    this.BulletedList1.Items.Add(new ListItem("Creating events tables."));
+                    this.BulletedList1.Items.Add(new ListItem("Creating events table."));
                     if (!this._db.TableExist("ec_events"))
                     {
                         this._db.CreateTable<CalendarEntry>(false);
-                        this.BulletedList1.Items.Add(new ListItem("Successfully created tables."));
+                        this.BulletedList1.Items.Add(new ListItem("Successfully created table."));
+                    }
+                    else
+                    {
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be meda or no alter table script has been added"));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.BulletedList1.Items.Add(new ListItem(ex.Message));
+                }
+
+                //Create Locations table
+                try
+                {
+                    this.BulletedList1.Items.Add(new ListItem("Creating locations table."));
+                    if (!this._db.TableExist("ec_locations"))
+                    {
+                        this._db.CreateTable<EventLocation>(false);
+                        this.BulletedList1.Items.Add(new ListItem("Successfully created table."));
                     }
                     else
                     {

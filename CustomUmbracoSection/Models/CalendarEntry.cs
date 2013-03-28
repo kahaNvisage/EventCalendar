@@ -19,6 +19,9 @@ namespace EventCalendar.Models
         [Column("calendarid")]
         public int calendarId { get; set; }
 
+        [Column("locationId")]
+        public int locationId { get; set; }
+
         [Column("title")]
         public string title { get; set; }
 
@@ -33,11 +36,5 @@ namespace EventCalendar.Models
 
         [Column("description")]
         public string description { get; set; }
-
-        [Column("latitude")]
-        public string lat { get; set; }
-
-        [Column("longitude")]
-        public string lon { get; set; }
     }
 }

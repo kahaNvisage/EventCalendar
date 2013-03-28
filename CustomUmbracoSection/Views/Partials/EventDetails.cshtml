@@ -1,46 +1,67 @@
 ﻿@model EventCalendar.Models.EventDetailsModel
 @using System.Globalization
-
-
-<script type="text/javascript">
-    $(document).ready(function () {
-        var myLatlng = new google.maps.LatLng(@Model.Latitude,@Model.Longitude);
-        var mapOptions = {
-            center: myLatlng,
-            zoom: 14,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        var map = new google.maps.Map(document.getElementById("map_canvas"),
-            mapOptions);
-        var marker = new google.maps.Marker({
-            position: myLatlng,
-            map: map,
-            title:"Your Target"
+@{
+    var showLocation = (Model.LocationId != 0) ? true : false;
+}
+@if (showLocation)
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var myLatlng = new google.maps.LatLng(@Model.Location.lat,@Model.Location.lon);
+            var mapOptions = {
+                center: myLatlng,
+                zoom: 14,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("map_canvas"),
+                mapOptions);
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+                title:"Your Target"
+            });
         });
-    });
-</script>
-
+    </script>
+}
 <section class="EventDetails">
-<div class="row-fluid">
-    <h1>@Model.Title</h1>
-</div>
-<div class="row-fluid clearfix">
-    <div class="span4" id="settings">
-        <p>Start: @Model.StartDate</p>
-        <p>End: @Model.EndDate</p>
-    </div>
-    <div class="span8" id="location">
+    <div class="container">
         <div class="row-fluid">
-            <h2>Location</h2>
+            <h1>@Model.Title</h1>
         </div>
         <div class="row-fluid">
-            <div id="map_canvas" style="height:300px"></div>
+            <div class="span12" id="settings">
+                <p>
+                    Start: @Model.StartDate</p>
+                <p>
+                    End: @Model.EndDate</p>
+            </div>
+        </div>
+        <div class="row-fluid">
+            @if (showLocation)
+            {
+                <hr />
+                <div class="span12" id="location">
+                    <div class="row-fluid">
+                        <h2>
+                            Location: @Model.Location.LocationName</h2>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span4">
+                            @Model.Location.LocationAdress
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div id="map_canvas" style="height: 300px">
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row-fluid">
+            <hr />
+            <div class="span12" id="description">
+                @Html.Raw(Model.Description)
+            </div>
         </div>
     </div>
-</div>
-<div class="row-fluid">
-    <div class="span12" id="description">
-        @Html.Raw(Model.Description)
-    </div>
-</div>
 </section>

@@ -34,25 +34,17 @@
         @Html.ValidationMessageFor(x => x.end)
     </div>
     <div class="control-group">
+        @Html.LabelFor(x => x.locations, new { @class = "control-label" })
+        <div class="controls">
+            @Html.DropDownListFor(x => x.selectedLocation, Model.locations)
+        </div>
+    </div>
+    <div class="control-group">
         @Html.LabelFor(x => x.description, new { @class = "control-label" })
         <div class="controls">
             @Html.TextAreaFor(x => x.description)
         </div>
         @Html.ValidationMessageFor(x => x.description)
-    </div>
-    <div class="control-group">
-        <label for="LocationSearch" class="control-label">Location</label>
-        <div class="controls">
-            <fieldset class="gllpLatlonPicker">
-                <input type="text" class="gllpSearchField">
-		        <input type="button" class="gllpSearchButton" value="search">
-		        <br/><br/>
-		        <div class="gllpMap">Google Maps</div>
-                @Html.HiddenFor(x => x.lat, new { @class = "gllpLatitude" })
-                @Html.HiddenFor(x => x.lon, new { @class = "gllpLongitude" })
-		        <input type="hidden" class="gllpZoom" value="12"/>
-            </fieldset>
-        </div>
     </div>
     <div class="control-group">
         <div class="controls">

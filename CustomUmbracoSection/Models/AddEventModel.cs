@@ -36,6 +36,12 @@ namespace EventCalendar.Models
         public string description { get; set; }
 
         [HiddenInput]
+        public int selectedLocation { get; set; }
+
+        [Display(Name = "Location")]
+        public SelectList locations { get; set; }
+
+        [HiddenInput]
         public string lat { get; set; }
 
         [HiddenInput]

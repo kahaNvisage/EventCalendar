@@ -47,18 +47,19 @@ namespace EventCalendar.Tasks
         }
 
         public bool Save()
-        {
-                        
+        {                        
             //Code that will execute on creation
             this._db.Insert(new ECalendar()
             {
                 Calendarname = Alias,
                 DisplayOnSite = true,
-                IsGCal = false
+                IsGCal = false,
+                GCalFeedUrl = ""
             });
             int id = this._db.SingleOrDefault<ECalendar>("SELECT TOP 1 * FROM ec_calendars ORDER BY id DESC").Id;
 
-            m_returnUrl = string.Format("Plugins/EventCalendar/editEventCalendar.aspx?id={0}", id);
+            //m_returnUrl = string.Format("Plugins/EventCalendar/editEventCalendar.aspx?id={0}", id);
+            m_returnUrl = string.Format("/EventCalendar/ECBackendSurface?id={0}", id);
 
             return true;
         }
@@ -67,7 +68,7 @@ namespace EventCalendar.Tasks
         {
             //Code that will execute when deleting
             ECalendar c = this._db.SingleOrDefault<ECalendar>(ParentID);
-            List<CalendarEntry> events = (List<CalendarEntry>)this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", c.Id);
+            var events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", c.Id);
             foreach (CalendarEntry e in events)
             {
                 this._db.Delete(e);

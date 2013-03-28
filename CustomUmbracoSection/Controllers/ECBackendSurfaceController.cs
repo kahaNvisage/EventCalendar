@@ -64,7 +64,10 @@ namespace EventCalendar.Controllers
         [HttpGet]
         public ActionResult AddEvent(int id)
         {
-            return PartialView(new AddEventModel() { calendarId = id });
+            List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
+            locations.Insert(0, new EventLocation() { LocationName = "No Location", Id = 0 });
+            SelectList list = new SelectList(locations, "Id", "LocationName");
+            return PartialView(new AddEventModel() { calendarId = id, locations = list });
         }
 
         [HttpPost]
@@ -91,8 +94,7 @@ namespace EventCalendar.Controllers
                     description = new_event.description,
                     title = new_event.title,
                     start = new_event.start,
-                    lat = new_event.lat,
-                    lon = new_event.lon
+                    locationId = new_event.selectedLocation
                 };
             if (null != new_event.end)
             {
@@ -100,15 +102,20 @@ namespace EventCalendar.Controllers
             }
             this._db.Insert(entry);
 
-            //ViewData["calendar"] = cal;
-            //return PartialView("Index");
             return RedirectToAction("Index", new { id = cal.Id });
         }
 
         [HttpGet]
         public ActionResult EditEventForm(int id = 0)
         {
+            List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
+            locations.Insert(0, new EventLocation() { LocationName = "No Location", Id = 0 });
+            
+            //Get the Event from Database
             CalendarEntry entry = this._db.SingleOrDefault<CalendarEntry>(id);
+            //Create SelectList with selected location
+            SelectList list = new SelectList(locations, "Id", "LocationName", entry.locationId);
+            //Create Model for the View
             EditEventModel eem = new EditEventModel()
             {
                 Id = entry.Id,
@@ -117,23 +124,28 @@ namespace EventCalendar.Controllers
                 description = entry.description,
                 calendarId = entry.calendarId,
                 allday = entry.allDay,
-                lat = entry.lat,
-                lon = entry.lon
+                locations = list
             };
             if (null != entry.end)
             {
                 eem.end = (DateTime)entry.end;
             }
+
+            
             return PartialView("EditEventForm",eem);
         }
 
         [HttpPost]
         public ActionResult EditEventForm(EditEventModel e)
         {
+            List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
+            locations.Insert(0, new EventLocation() { LocationName = "No Location", Id = 0 });
+            SelectList list = new SelectList(locations, "Id", "LocationName", e.selectedLocation);
+            e.locations = list;
             if (!ModelState.IsValid)
             {
                 TempData["StatusEditEvent"] = "Invalid";
-                return PartialView("EditEventForm");
+                return PartialView("EditEventForm",e);
             }
             TempData["StatusEditEvent"] = "Valid";
             CalendarEntry entry = new CalendarEntry()
@@ -145,11 +157,10 @@ namespace EventCalendar.Controllers
                 end = e.end,
                 start = e.start,
                 Id = e.Id,
-                lat = e.lat,
-                lon = e.lon
+                locationId = e.selectedLocation
             };
             this._db.Update(entry);
-            return PartialView("EditEventForm");
+            return PartialView("EditEventForm",e);
         }
 
         [HttpPost]
@@ -158,6 +169,26 @@ namespace EventCalendar.Controllers
             List<CalendarEntry> events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0",id).ToList();
             string json = JsonConvert.SerializeObject(events);
             return json;
+        }
+
+        [HttpGet]
+        public ActionResult EditLocation(int id)
+        {
+            EventLocation el = this._db.SingleOrDefault<EventLocation>("SELECT * FROM ec_locations WHERE Id = @0", id);
+            return View(el);
+        }
+
+        [HttpPost]
+        public ActionResult EditLocation(EventLocation el)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["StatusEditLocation"] = "Invalid";
+                return View(el);
+            }
+            TempData["StatusEditLocation"] = "Valid";
+            this._db.Update(el);
+            return View(el);
         }
     }
 }
