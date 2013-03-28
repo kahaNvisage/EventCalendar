@@ -22,19 +22,19 @@
 @if (TempData["StatusEditLocation"] == "Invalid")
 {
     <div class="alert alert-error">
-        Settings couldn't be saved due to errors!
+        Location couldn't be saved due to errors!
         <a class="close" data-dismiss="alert" href="#">&times;</a>
     </div>
 }
 @if (TempData["StatusEditLocation"] == "Valid")
 {
     <div class="alert alert-success">
-        Settings saved!
+        Location saved!
         <a class="close" data-dismiss="alert" href="#">&times;</a>
     </div>
 }
 
-<form action="http://localhost:33314/umbraco/EventCalendar/ECBackendSurface/EditLocation" enctype="multipart/form-data" method="post" class="form-horizontal">
+<form action="~/umbraco/EventCalendar/ECBackendSurface/EditLocation" enctype="multipart/form-data" method="post" class="form-horizontal">
     @Html.HiddenFor(x => x.Id)
     <div class="control-group">
         @Html.LabelFor(x => x.LocationName, new { @class = "control-label" })

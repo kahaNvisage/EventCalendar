@@ -26,9 +26,11 @@ namespace EventCalendar.Models
         public string title { get; set; }
 
         [Column("starttime")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? start { get; set; }
 
         [Column("endtime")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? end { get; set; }
 
         [Column("allday")]

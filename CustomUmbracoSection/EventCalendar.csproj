@@ -119,6 +119,7 @@
   <ItemGroup>
     <Content Include="bin\controls.dll" />
     <Content Include="custom.gif" />
+    <Content Include="dashboard.ascx" />
     <Content Include="editCustom.aspx" />
     <Content Include="editEventCalendar.aspx" />
     <Content Include="EventCalendarSelector.ascx" />
@@ -128,6 +129,13 @@
   <ItemGroup>
     <Compile Include="Controllers\ECBackendSurfaceController.cs" />
     <Compile Include="Controllers\ECFrontendSurfaceController.cs" />
+    <Compile Include="dashboard.ascx.cs">
+      <DependentUpon>dashboard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="dashboard.ascx.designer.cs">
+      <DependentUpon>dashboard.ascx</DependentUpon>
+    </Compile>
     <Compile Include="editCustom.aspx.cs">
       <DependentUpon>editCustom.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

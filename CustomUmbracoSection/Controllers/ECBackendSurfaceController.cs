@@ -96,10 +96,15 @@ namespace EventCalendar.Controllers
                     start = new_event.start,
                     locationId = new_event.selectedLocation
                 };
-            if (null != new_event.end)
+            if (new_event.start > new_event.end)
+            {
+                entry.end = null;
+            }
+            else
             {
                 entry.end = new_event.end;
             }
+
             this._db.Insert(entry);
 
             return RedirectToAction("Index", new { id = cal.Id });
