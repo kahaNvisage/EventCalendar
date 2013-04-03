@@ -48,6 +48,8 @@ namespace EventCalendar.Trees
 
         public override void Render(ref XmlTree tree)
         {
+            int id = 0;
+
             if (this.NodeKey == string.Empty)
             {
 
@@ -56,14 +58,38 @@ namespace EventCalendar.Trees
             }
             else
             {
-                string keyType = this.NodeKey;
+                string keyType = this.NodeKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries)[0];
+                if(this.NodeKey.Contains("-"))
+                    id = Convert.ToInt32(this.NodeKey.Split(new string[] {"-"}, StringSplitOptions.RemoveEmptyEntries)[1]);
 
                 switch (keyType)
                 {
                     case "CalendarBase": this.RenderCalendar(ref tree); break;
                     case "LocationBase": RenderLocations(ref tree); break;
+                    case "CalendarEntry": RenderCalendarEntryNodes(ref tree, id); break;
                 }
             }
+        }
+
+        private void RenderCalendarEntryNodes(ref XmlTree tree, int id)
+        {
+            XmlTreeNode node = XmlTreeNode.Create(this);
+
+            //node.NodeID = 
+            node.NodeType = "CalendarSettings";
+            node.Text = "Settings";
+            node.Icon = "developerMacro.gif";
+            node.Action = "javascript:openCalendar(" + id.ToString() + ")";
+            node.Menu.Clear();
+            tree.Add(node);
+
+            node = XmlTreeNode.Create(this);
+            node.NodeType = "CalendarEvents";
+            node.Text = "Events";
+            node.Icon = "gear.png";
+            node.Action = "javascript:showEvents(" + id.ToString() + ")";
+            node.Menu.Clear();
+            tree.Add(node);
         }
 
         private void RenderLocations(ref XmlTree tree)
@@ -102,6 +128,13 @@ namespace EventCalendar.Trees
                     node.Text = c.Calendarname;
                     node.Icon = "calendar.png";
                     node.Action = "javascript:openCalendar(" + c.Id.ToString() + ")";
+
+                    var treeService = new TreeService(c.Id, TreeAlias, ShowContextMenu, IsDialog, DialogMode, app, "CalendarEntry-"+c.Id.ToString());
+                    node.Source = treeService.GetServiceUrl();
+
+                    node.Menu.Clear();
+                    node.Menu.Add(ActionNew.Instance);
+                    node.Menu.Add(ActionDelete.Instance);
 
                     tree.Add(node);
                 }
@@ -161,6 +194,10 @@ namespace EventCalendar.Trees
                     }
                     function openLocation(id) {
                         var url = '/EventCalendar/ECBackendSurface/EditLocation/?id=' + id;
+                        UmbClientMgr.contentFrame(url);
+                    }
+                    function showEvents(id) {
+                        var url = '/EventCalendar/ECBackendSurface/ShowEvents/?id=' + id;
                         UmbClientMgr.contentFrame(url);
                     }
                 ");

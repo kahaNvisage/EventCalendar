@@ -172,6 +172,7 @@
     <Compile Include="Models\EventDetailsModel.cs" />
     <Compile Include="Models\EventLocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\CalendarEntryTasks.cs" />
     <Compile Include="Tasks\CalendarTasks.cs" />
     <Compile Include="Tasks\LocationTasks.cs" />
     <Compile Include="Trees\LoadCustomTree.cs" />
@@ -191,16 +192,13 @@
     <Content Include="Views\Partials\EditCalendar.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Partials\ShowEvents.cshtml" />
+    <Content Include="Views\ECBackendSurface\ShowEvents.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Partials\AddEvent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Partials\EditEventForm.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\ECBackendSurface\Master.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

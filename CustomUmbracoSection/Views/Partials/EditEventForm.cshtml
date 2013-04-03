@@ -2,18 +2,18 @@
 @using System.Web.Mvc.Html
 @using System.Globalization
 
-<link type="text/css" href="@Url.Content("~/css/bootstrap.css")" rel="stylesheet" />
-<link type="text/css" href="@Url.Content("~/css/jquery-ui-1.10.2.custom.min.css")" rel="stylesheet" />
-<link rel="stylesheet" type="text/css" href="@Url.Content("~/css/jquery-gmaps-latlon-picker.css")"/>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-1.9.1.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-1.10.2.custom.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-timepicker-addon.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-sliderAccess.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery.validate.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery.validate.unobtrusive.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/bootstrap.min.js")"></script>
+<link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
+<link type="text/css" href="@Url.Content("~/css/EventCalendar/jquery-ui-1.10.2.custom.min.css")" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/css/EventCalendar/jquery-gmaps-latlon-picker.css")"/>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-1.9.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-ui-1.10.2.custom.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-ui-timepicker-addon.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-ui-sliderAccess.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/bootstrap.min.js")"></script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-<script src="@Url.Content("~/scripts/jquery-gmaps-latlon-picker.js")"></script>
+<script src="@Url.Content("~/scripts/EventCalendar/jquery-gmaps-latlon-picker.js")"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $(".alert").alert();
@@ -99,7 +99,7 @@
     </div>
     <div class="control-group">
         <div class="controls">
-            <input type="submit" value="Senden" class="btn btn-primary">
+            <input type="submit" value="Save" class="btn btn-primary">
         </div>
     </div>
     </fieldset>

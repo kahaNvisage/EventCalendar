@@ -31,7 +31,7 @@ namespace EventCalendar.Controllers
                 cal = this._db.SingleOrDefault<ECalendar>(id);
             }
             ViewData["calendar"] = cal;
-            return View();
+            return View(cal);
         }
 
         [HttpPost]
@@ -52,16 +52,17 @@ namespace EventCalendar.Controllers
             return RedirectToAction("Index", new { id = calendar.Id });
         }
 
-        [ChildActionOnly]
+        [HttpGet]
         public ActionResult ShowEvents(int id)
         {
             List<CalendarEntry> events = null;
-            events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events").ToList();
+            events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events ORDER BY id DESC").ToList();
 
             return PartialView(events);
         }
 
         [HttpGet]
+        [Obsolete("Was used before using Tasks to create Events")]
         public ActionResult AddEvent(int id)
         {
             List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
@@ -71,6 +72,7 @@ namespace EventCalendar.Controllers
         }
 
         [HttpPost]
+        [Obsolete("Was used before using Tasks to create Events")]
         public ActionResult AddEvent(AddEventModel new_event)
         {
             ECalendar cal = null;

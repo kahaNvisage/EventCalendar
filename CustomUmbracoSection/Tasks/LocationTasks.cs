@@ -54,7 +54,7 @@ namespace EventCalendar.Tasks
                 lon = "",
                 LocationAdress = ""
             });
-            int id = this._db.SingleOrDefault<EventLocation>("SELECT TOP 1 * FROM ec_calendars ORDER BY id DESC").Id;
+            int id = this._db.SingleOrDefault<EventLocation>("SELECT TOP 1 * FROM ec_locations ORDER BY id DESC").Id;
 
             //m_returnUrl = string.Format("Plugins/EventCalendar/editEventCalendar.aspx?id={0}", id);
             m_returnUrl = string.Format("/EventCalendar/ECBackendSurface/EditLocation/?id={0}", id);

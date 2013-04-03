@@ -1,62 +1,69 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-@using EventCalendar.Controllers
+﻿@model EventCalendar.Models.ECalendar
 @using EventCalendar.Models
 @using System.Web.Mvc.Html
 @using System.Globalization
 
-
-<link type="text/css" href="@Url.Content("~/css/bootstrap.css")" rel="stylesheet" />
-<link type="text/css" href="@Url.Content("~/css/jquery-ui-1.10.2.custom.min.css")" rel="stylesheet" />
-<link rel="stylesheet" type="text/css" href="@Url.Content("~/css/jquery-gmaps-latlon-picker.css")"/>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-1.9.1.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-1.10.2.custom.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-timepicker-addon.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery-ui-sliderAccess.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery.validate.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/jquery.validate.unobtrusive.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/bootstrap.min.js")"></script>
-<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-<script src="@Url.Content("~/scripts/jquery-gmaps-latlon-picker.js")"></script>
+<link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-1.9.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/bootstrap.min.js")"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $(".alert").alert();
-        $('#myTab a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        })
-        $(".form_datetime1").datetimepicker({ dateFormat: "yy-mm-dd" });
-        $(".form_datetime2").datetimepicker({ dateFormat: "yy-mm-dd" });
     });
 </script>
-<style type="text/css">
-    /* css for timepicker */
-.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-.ui-timepicker-div dl { text-align: left; }
-.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-.ui-timepicker-div td { font-size: 90%; }
-.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
 
-.ui-timepicker-rtl{ direction: rtl; }
-.ui-timepicker-rtl dl { text-align: right; }
-.ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
-</style>
-
-<h1>EventCalendar</h1>
-<ul class="nav nav-tabs" id="myTab">
-  <li class="active"><a href="#settings">Settings</a></li>
-  <li><a href="#addEvent">Add Event</a></li>
-  <li><a href="#events">Events</a></li>
-</ul>
- 
-<div class="tab-content">
-  <div class="tab-pane active" id="settings">
-    @Html.Partial("EditCalendar", (ECalendar)ViewBag.calendar)
-  </div>
-  <div class="tab-pane" id="addEvent">
-    @Html.Action("AddEvent", "ECBackendSurface", new { id = ((ECalendar)ViewBag.calendar).Id })
-  </div>
-  <div class="tab-pane" id="events">
-    @Html.Action("ShowEvents","ECBackendSurface",new { id = ((ECalendar)ViewBag.calendar).Id })
-  </div>
+<h1>Settings</h1>
+<div class="container">
+    <div class="row-fluid" id="settings">
+        @if (TempData["StatusSettings"] == "Invalid")
+        {
+            <div class="alert alert-error">
+                Settings couldn't be saved due to errors! <a class="close" data-dismiss="alert" href="#">
+                    &times;</a>
+            </div>
+        }
+        @if (TempData["StatusSettings"] == "Valid")
+        {
+            <div class="alert alert-success">
+                Settings saved! <a class="close" data-dismiss="alert" href="#">&times;</a>
+            </div>
+        }
+        <form action="http://localhost:33314/umbraco/EventCalendar/ECBackendSurface/EditCalendar"
+        enctype="multipart/form-data" method="post" class="form-horizontal">
+        @Html.HiddenFor(x => x.Id)
+        <div class="control-group">
+            @Html.LabelFor(x => x.Calendarname, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(x => x.Calendarname)
+            </div>
+            @Html.ValidationMessageFor(x => x.Calendarname)
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(x => x.IsGCal, new { @class = "control-label" })
+            <div class="controls">
+                @Html.CheckBoxFor(x => x.IsGCal)
+                @Html.HiddenFor(x => x.IsGCal)
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(x => x.GCalFeedUrl, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(x => x.GCalFeedUrl)
+            </div>
+            @Html.ValidationMessageFor(x => x.Calendarname)
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(x => x.DisplayOnSite, new { @class = "control-label" })
+            <div class="controls">
+                @Html.CheckBoxFor(x => x.DisplayOnSite)
+                @Html.HiddenFor(x => x.DisplayOnSite)
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <input type="submit" value="Save" class="btn btn-primary">
+            </div>
+        </div>
+        </form>
+    </div>
 </div>

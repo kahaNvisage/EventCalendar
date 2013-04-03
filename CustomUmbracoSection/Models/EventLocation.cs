@@ -22,7 +22,7 @@ namespace EventCalendar.Models
 
         [Column("lname")]
         [Required]
-        [Display(Name = "Calendar Name")]
+        [Display(Name = "Location Name")]
         public string LocationName { get; set; }
 
         [Column("adress")]
