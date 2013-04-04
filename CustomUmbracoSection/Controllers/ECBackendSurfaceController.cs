@@ -171,9 +171,16 @@ namespace EventCalendar.Controllers
         }
 
         [HttpPost]
-        public string GetCalendarEventsAsJson(int id)
+        public string GetCalendarEventsAsJson(int id,int start = 0, int end = 0)
         {
-            List<CalendarEntry> events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0",id).ToList();
+            DateTime startDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            startDate =  startDate.AddSeconds(start);
+            DateTime endDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            endDate = endDate.AddSeconds(end);
+
+            List<CalendarEntry> events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", id).ToList();
+            //events = events.Where(x => x.start >= startDate && x.end <= endDate).ToList();
+
             string json = JsonConvert.SerializeObject(events);
             return json;
         }

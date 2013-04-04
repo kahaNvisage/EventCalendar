@@ -52,7 +52,10 @@ namespace EventCalendar.Tasks
                 LocationName = Alias,
                 lat = "",
                 lon = "",
-                LocationAdress = ""
+                Street = "",
+                ZipCode = "",
+                City = "",
+                Country = ""
             });
             int id = this._db.SingleOrDefault<EventLocation>("SELECT TOP 1 * FROM ec_locations ORDER BY id DESC").Id;
 

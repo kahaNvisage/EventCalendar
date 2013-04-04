@@ -127,6 +127,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\CreateRecurringEvent.cs" />
     <Compile Include="Controllers\ECBackendSurfaceController.cs" />
     <Compile Include="Controllers\ECFrontendSurfaceController.cs" />
     <Compile Include="dashboard.ascx.cs">

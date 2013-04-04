@@ -25,10 +25,25 @@ namespace EventCalendar.Models
         [Display(Name = "Location Name")]
         public string LocationName { get; set; }
 
-        [Column("adress")]
-        [Required]
-        [Display(Name = "Adress")]
-        public string LocationAdress { get; set; }
+        [Column("street")]
+        [Display(Name = "Street")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Street { get; set; }
+
+        [Column("zip")]
+        [Display(Name = "Zipcode")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string ZipCode { get; set; }
+
+        [Column("city")]
+        [Display(Name = "City")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string City { get; set; }
+
+        [Column("country")]
+        [Display(Name = "Country")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Country { get; set; }
 
         [Column("latitude")]
         public string lat { get; set; }
