@@ -1,0 +1,94 @@
+﻿@model EventCalendar.Models.EditRecurringEventModel
+@using System.Web.Mvc.Html
+@using System.Globalization
+
+<link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-1.9.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-ui-1.10.2.custom.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-ui-timepicker-addon.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-ui-sliderAccess.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.unobtrusive.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/bootstrap.min.js")"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".alert").alert();
+    });
+</script>
+
+<h1>Edit Event</h1>
+
+@if (TempData["StatusEditEvent"] == "Invalid")
+{
+    <div class="alert alert-error">
+        Event couldn't be saved due to errors!
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+    </div>
+}
+@if (TempData["StatusEditEvent"] == "Valid")
+{
+    <div class="alert alert-success">
+        Event saved!
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+    </div>
+}
+
+<form action="~/umbraco/EventCalendar/ECBackendSurface/EditRecurringEvent" enctype="multipart/form-data" method="post" class="form-horizontal">
+    <fieldset>
+    @Html.HiddenFor(x => x.id)
+    @Html.HiddenFor(x => x.calendar)
+    <div class="control-group">
+        @Html.LabelFor(x => x.title, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextBoxFor(x => x.title)
+        </div>
+        @Html.ValidationMessageFor(x => x.title)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.allDay, new { @class = "control-label" })
+        <div class="controls">
+            @Html.CheckBoxFor(x => x.allDay)
+        </div>
+        @Html.ValidationMessageFor(x => x.allDay)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.day, new { @class = "control-label" })
+        <div class="controls">
+            @Html.DropDownListFor(x => x.day, new System.Web.Mvc.SelectList(Enum.GetValues(typeof(ScheduleWidget.Enums.DayOfWeekEnum))))
+        </div>
+        @Html.ValidationMessageFor(x => x.day)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.frequency, new { @class = "control-label" })
+        <div class="controls">
+            @Html.DropDownListFor(x => x.frequency, new System.Web.Mvc.SelectList(Enum.GetValues(typeof(ScheduleWidget.Enums.FrequencyTypeEnum))))
+        </div>
+        @Html.ValidationMessageFor(x => x.frequency)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.monthly, new { @class = "control-label" })
+        <div class="controls">
+            @Html.DropDownListFor(x => x.monthly, new System.Web.Mvc.SelectList(Enum.GetValues(typeof(ScheduleWidget.Enums.MonthlyIntervalEnum))))
+        </div>
+        @Html.ValidationMessageFor(x => x.monthly)
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.locations, new { @class = "control-label" })
+        <div class="controls">
+            @Html.DropDownListFor(x => x.selectedLocation, Model.locations)
+        </div>
+    </div>
+    <div class="control-group">
+        @Html.LabelFor(x => x.description, new { @class = "control-label" })
+        <div class="controls">
+            @Html.TextAreaFor(x => x.description)
+        </div>
+        @Html.ValidationMessageFor(x => x.description)
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <input type="submit" value="Save" class="btn btn-primary">
+        </div>
+    </div>
+    </fieldset>
+</form>

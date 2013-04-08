@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using EventCalendar.Models;
 using Umbraco.Core.Persistence;
 using Newtonsoft.Json;
+using ScheduleWidget.Enums;
+using ScheduleWidget.ScheduledEvents;
 
 namespace EventCalendar.Controllers
 {
@@ -56,8 +58,27 @@ namespace EventCalendar.Controllers
         public ActionResult ShowEvents(int id)
         {
             List<CalendarEntry> events = null;
-            events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events ORDER BY id DESC").ToList();
+            events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events ORDER BY id DESC").Where(x => x.calendarId == id).ToList();
 
+            return PartialView(events);
+        }
+
+        [HttpGet]
+        public ActionResult ShowRecurringEvents(int id)
+        {
+            List<RecurringEventListModel> events = new List<RecurringEventListModel>();
+            var tmp = this._db.Query<RecurringEvent>("SELECT * FROM ec_recevents ORDER BY id DESC").Where(x => x.calendarId == id).ToList();
+            foreach (var t in tmp)
+            {
+                events.Add(new RecurringEventListModel()
+                {
+                    title = t.title,
+                    allDay = t.allDay,
+                    day = (DayOfWeekEnum)t.day,
+                    frequency = (FrequencyTypeEnum)t.frequency,
+                    Id = t.Id
+                });
+            }
             return PartialView(events);
         }
 
@@ -170,6 +191,66 @@ namespace EventCalendar.Controllers
             return PartialView("EditEventForm",e);
         }
 
+        public ActionResult EditRecurringEvent(int id = 0)
+        {
+            List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
+            locations.Insert(0, new EventLocation() { LocationName = "No Location", Id = 0 });
+            
+            var e = _db.Single<RecurringEvent>(id);
+
+            //Create SelectList with selected location
+            SelectList list = new SelectList(locations, "Id", "LocationName", e.locationId);
+
+            EditRecurringEventModel ere = new EditRecurringEventModel(){
+                title = e.title,
+                description = e.description,
+                allDay = e.allDay,
+                id = e.Id,
+                day = (DayOfWeekEnum)e.day,
+                frequency = (FrequencyTypeEnum)e.frequency,
+                monthly = (MonthlyIntervalEnum)e.monthly_interval,
+                calendar = e.calendarId,
+                locations = list,
+                selectedLocation = e.locationId
+            };
+
+            return PartialView(ere);
+        }
+
+        [HttpPost]
+        public ActionResult EditRecurringEvent(EditRecurringEventModel ere)
+        {
+            List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
+            locations.Insert(0, new EventLocation() { LocationName = "No Location", Id = 0 });
+            SelectList list = new SelectList(locations, "Id", "LocationName", ere.selectedLocation);
+            ere.locations = list;
+
+            if (!ModelState.IsValid)
+            {
+                TempData["StatusEditEvent"] = "Invalid";
+                return PartialView(ere);
+            }
+
+            TempData["StatusEditEvent"] = "Valid";
+
+            RecurringEvent re = new RecurringEvent()
+            {
+                Id = ere.id,
+                title = ere.title,
+                allDay = ere.allDay,
+                calendarId = ere.calendar,
+                locationId = ere.selectedLocation,
+                description = ere.description,
+                day = (int)ere.day,
+                frequency = (int)ere.frequency,
+                monthly_interval = (int)ere.monthly
+            };
+
+            _db.Update(re, re.Id);
+
+            return PartialView(ere);
+        }
+
         [HttpPost]
         public string GetCalendarEventsAsJson(int id,int start = 0, int end = 0)
         {
@@ -178,8 +259,54 @@ namespace EventCalendar.Controllers
             DateTime endDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
             endDate = endDate.AddSeconds(end);
 
-            List<CalendarEntry> events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", id).ToList();
-            //events = events.Where(x => x.start >= startDate && x.end <= endDate).ToList();
+            List<EventsOverviewModel> events = new List<EventsOverviewModel>();
+            List<Schedule> schedules = new List<Schedule>();
+            DateRange range = new DateRange();
+            range.StartDateTime = startDate;
+            range.EndDateTime = endDate;
+
+            //Handle normal events
+            var normal_events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", id).ToList();
+            foreach (var ne in normal_events)
+            {
+                events.Add(
+                    new EventsOverviewModel()
+                    {
+                        type = EventType.Normal,
+                        title = ne.title,
+                        allDay = ne.allDay,
+                        description = ne.description,
+                        end = ne.end,
+                        start = ne.start,
+                        id = ne.Id
+                    });
+            }
+
+            //Handle recurring events
+            var recurring_events = this._db.Query<RecurringEvent>("SELECT * FROM ec_recevents WHERE calendarId = @0 ORDER BY id DESC", id).ToList();
+            foreach(var e in recurring_events) {
+                var schedule = new Schedule(
+                    new Event()
+                    {
+                        Title = e.title,
+                        ID = e.Id,
+                        DaysOfWeekOptions = (DayOfWeekEnum)e.day,
+                        FrequencyTypeOptions = (FrequencyTypeEnum)e.frequency,
+                        MonthlyIntervalOptions = (MonthlyIntervalEnum)e.monthly_interval
+                    });
+                foreach (var tmp in schedule.Occurrences(range))
+                {
+                    events.Add(new EventsOverviewModel()
+                    {
+                        title = e.title,
+                        id = e.Id,
+                        allDay = e.allDay,
+                        description = e.description,
+                        start = tmp,
+                        type = EventType.Recurring
+                    });
+                }
+            }
 
             string json = JsonConvert.SerializeObject(events);
             return json;
@@ -203,6 +330,34 @@ namespace EventCalendar.Controllers
             TempData["StatusEditLocation"] = "Valid";
             this._db.Update(el);
             return View(el);
+        }
+
+        [HttpGet]
+        public ActionResult DeleteEvent(int id)
+        {
+            var eve = this._db.Single<CalendarEntry>(id);
+            return PartialView(eve);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteEvent(CalendarEntry entry)
+        {
+            this._db.Delete<CalendarEntry>(entry.Id);
+            return RedirectToAction("ShowEvents", new { id = entry.calendarId });
+        }
+
+        [HttpGet]
+        public ActionResult DeleteRecurringEvent(int id)
+        {
+            var eve = this._db.Single<RecurringEvent>(id);
+            return PartialView(eve);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteRecurringEvent(RecurringEvent e)
+        {
+            this._db.Delete<RecurringEvent>(e.Id);
+            return RedirectToAction("ShowRecurringEvents", new { id = e.calendarId });
         }
     }
 }

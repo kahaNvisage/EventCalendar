@@ -57,7 +57,11 @@
                             window.open(event.url);
                             return false;
                         } else {
-                            window.location.href = '@Model.Content.Down().Url?id='+event.Id;
+                            if(event.type == 1) {
+                                window.location.href = '@Model.Content.Down().Url?id='+event.id+'&type=1';
+                            } else {
+                                window.location.href = '@Model.Content.Down().Url?id='+event.id+'&amp;type=0';
+                            }
                             return false;
                         }
                     }

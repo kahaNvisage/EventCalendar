@@ -64,6 +64,22 @@ namespace EventCalendar
                     this.BulletedList1.Items.Add(new ListItem(ex.Message));
                 }
 
+                //Create Recurring Events Table
+                try
+                {
+                    this.BulletedList1.Items.Add(new ListItem("Creating recurring events table."));
+                    if (!this._db.TableExist("ec_recevents"))
+                    {
+                        this._db.CreateTable<RecurringEvent>(false);
+                        this.BulletedList1.Items.Add(new ListItem("Successfully created table."));
+                    }
+                    else
+                    {
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be meda or no alter table script has been added"));
+                    }
+                }
+                catch (Exception ex) { }
+
                 //Create Locations table
                 try
                 {

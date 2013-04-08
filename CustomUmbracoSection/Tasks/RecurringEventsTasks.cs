@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco.interfaces;
+using EventCalendar.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core;
-using EventCalendar.Models;
 
 namespace EventCalendar.Tasks
 {
-    public class CalendarEntryTasks : umbraco.interfaces.ITaskReturnUrl, ITask
+    public class RecurringEventsTasks : umbraco.interfaces.ITaskReturnUrl, ITask
     {
         private string _alias;
         private int _parentID;
@@ -48,21 +48,22 @@ namespace EventCalendar.Tasks
         }
 
         public bool Save()
-        {                        
+        {
             //Code that will execute on creation
-            this._db.Insert(new CalendarEntry()
+            var id = this._db.Insert(new RecurringEvent()
             {
                 title = this.Alias,
                 allDay = false,
-                start = DateTime.Now,
-                end = null,
                 description = "",
                 locationId = 0,
-                calendarId = this.ParentID - 1
+                calendarId = this.ParentID - 2,
+                day = 0,
+                frequency = 0,
+                monthly_interval = 0
             });
-            int id = this._db.SingleOrDefault<CalendarEntry>("SELECT TOP 1 * FROM ec_events ORDER BY id DESC").Id;
+            //int id = this._db.SingleOrDefault<RecurringEvent>("SELECT TOP 1 * FROM ec_rcevents ORDER BY id DESC").Id;
 
-            m_returnUrl = string.Format("/EventCalendar/ECBackendSurface/EditEventForm?id={0}", id);
+            m_returnUrl = string.Format("/EventCalendar/ECBackendSurface/EditRecurringEvent/?id={0}", Convert.ToInt32(id.ToString()));
 
             return true;
         }
@@ -71,11 +72,6 @@ namespace EventCalendar.Tasks
         {
             //Code that will execute when deleting
             return false;
-        }
-
-        public CalendarEntryTasks()
-        {
-
         }
 
         #region ITaskReturnUrl Members

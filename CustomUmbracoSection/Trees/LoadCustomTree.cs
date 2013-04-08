@@ -73,22 +73,32 @@ namespace EventCalendar.Trees
 
         private void RenderCalendarEntryNodes(ref XmlTree tree, int id)
         {
-            XmlTreeNode node = XmlTreeNode.Create(this);
-
-            //node.NodeID = 
+            XmlTreeNode node = XmlTreeNode.Create(this);                       
             node.NodeType = "CalendarSettings";
             node.Text = "Settings";
             node.Icon = "developerMacro.gif";
             node.Action = "javascript:openCalendar(" + id.ToString() + ")";
-            node.Menu.Clear();
+            node.Menu.Clear();            
             tree.Add(node);
 
             node = XmlTreeNode.Create(this);
+            node.NodeID = (1 + id).ToString();
             node.NodeType = "CalendarEvents";
             node.Text = "Events";
-            node.Icon = "gear.png";
+            node.Icon = "cog.png";
             node.Action = "javascript:showEvents(" + id.ToString() + ")";
             node.Menu.Clear();
+            node.Menu.Add(ActionNew.Instance);
+            tree.Add(node);
+
+            node = XmlTreeNode.Create(this);
+            node.NodeID = (2 + id).ToString();
+            node.NodeType = "CalendarRecurringEvents";
+            node.Text = "Recurring Events";
+            node.Icon = "cog.png";
+            node.Action = "javascript:showRecurringEvents(" + id.ToString() + ")";
+            node.Menu.Clear();
+            node.Menu.Add(ActionNew.Instance);
             tree.Add(node);
         }
 
@@ -133,7 +143,7 @@ namespace EventCalendar.Trees
                     node.Source = treeService.GetServiceUrl();
 
                     node.Menu.Clear();
-                    node.Menu.Add(ActionNew.Instance);
+                    //node.Menu.Add(ActionNew.Instance);
                     node.Menu.Add(ActionDelete.Instance);
 
                     tree.Add(node);
@@ -198,6 +208,10 @@ namespace EventCalendar.Trees
                     }
                     function showEvents(id) {
                         var url = '/EventCalendar/ECBackendSurface/ShowEvents/?id=' + id;
+                        UmbClientMgr.contentFrame(url);
+                    }
+                    function showRecurringEvents(id) {
+                        var url = '/EventCalendar/ECBackendSurface/ShowRecurringEvents/?id=' + id;
                         UmbClientMgr.contentFrame(url);
                     }
                 ");

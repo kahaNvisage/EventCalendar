@@ -1,5 +1,5 @@
 ﻿@using EventCalendar.Models
-@model List<CalendarEntry>
+@model List<RecurringEventListModel>
 @using System.Web.Mvc.Html
 
 <link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
@@ -9,20 +9,20 @@
         <tr>
             <th>Title</th>
             <th>AllDay</th>
-            <th>Start</th>
-            <th>End</th>
+            <th>Day</th>
+            <th>Frequenzy</th>
             <th>&nbsp;</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (CalendarEntry e in Model)
+        @foreach (var e in Model)
         {
             <tr>
-                <td><a href="~/umbraco/EventCalendar/ECBackendSurface/EditEventForm/?id=@e.Id">@e.title</a></td>
+                <td><a href="~/umbraco/EventCalendar/ECBackendSurface/EditRecurringEvent/?id=@e.Id">@e.title</a></td>
                 <td>@e.allDay</td>
-                <td>@e.start</td>
-                <td>@e.end</td>
-                <td>@Html.ActionLink("Delete", "DeleteEvent", new { id = e.Id })</td>
+                <td>@e.day</td>
+                <td>@e.frequency</td>
+                <td>@Html.ActionLink("Delete", "DeleteRecurringEvent", new { id = e.Id })</td>
             </tr>
         }
     </tbody>

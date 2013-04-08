@@ -1,0 +1,15 @@
+﻿@model EventCalendar.Models.RecurringEvent
+
+<link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
+
+<div class="container">
+    <form method="post" action="">
+        <fieldset>
+            <legend>Really delete the Event?</legend>
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="calendarId" value="@Model.calendarId" />
+            <label>@Model.title</label>
+            <input type="submit" value="Delete" class="btn btn-primary" />
+        </fieldset>
+    </form>
+</div>

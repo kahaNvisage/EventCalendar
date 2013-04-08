@@ -26,6 +26,6 @@
         </style>
     </head>
     <body>
-        @Html.Action("GetEventDetails", "ECFrontendSurface", new { area = "EventCalendar", id = Request["id"] })
+        @Html.Action("GetEventDetails", "ECFrontendSurface", new { area = "EventCalendar", id = Request["id"], type = Request["type"] })
     </body>
 </html>
