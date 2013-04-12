@@ -38,6 +38,7 @@ namespace EventCalendar.Models
         [Required]
         [Display(Name = "Description")]
         [DataType(DataType.Html)]
+        [AllowHtml]
         public string description { get; set; }
 
         [HiddenInput]

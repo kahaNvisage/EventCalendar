@@ -56,7 +56,8 @@ namespace EventCalendar
                     }
                     else
                     {
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be meda or no alter table script has been added"));
+                        int i = this._db.Execute("ALTER TABLE ec_events ALTER COLUMN description ntext", new { });
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altered some fields."));
                     }
                 }
                 catch (Exception ex)

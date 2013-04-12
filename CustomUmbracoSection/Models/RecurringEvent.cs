@@ -66,6 +66,8 @@ namespace EventCalendar.Models
         public bool allDay { get; set; }
 
         [Display(Name = "Description")]
+        [DataType(DataType.Html)]
+        [AllowHtml]
         public string description { get; set; }
 
         [Display(Name = "Day of the event")]

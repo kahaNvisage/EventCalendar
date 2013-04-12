@@ -12,6 +12,7 @@
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.unobtrusive.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/bootstrap.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/ckeditor/ckeditor.js")"></script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <script src="@Url.Content("~/scripts/EventCalendar/jquery-gmaps-latlon-picker.js")"></script>
 <script type="text/javascript">
@@ -93,7 +94,7 @@
     <div class="control-group">
         @Html.LabelFor(x => x.description, new { @class = "control-label" })
         <div class="controls">
-            @Html.TextAreaFor(x => x.description)
+            @Html.TextAreaFor(x => x.description, new { @class = "ckeditor" })
         </div>
         @Html.ValidationMessageFor(x => x.description)
     </div>

@@ -37,6 +37,7 @@ namespace EventCalendar.Models
         public bool allDay { get; set; }
 
         [Column("description")]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string description { get; set; }
     }
 }
