@@ -16,7 +16,14 @@ namespace EventCalendar
     {
         public static ECalendar GetCalendar(int id)
         {
-            return ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<ECalendar>(id);
+            if (id == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<ECalendar>(id);
+            }
         }
     }
 }

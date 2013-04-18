@@ -37,7 +37,17 @@ namespace EventCalendar
                     }
                     else
                     {
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be meda or no alter table script has been added"));
+                        try
+                        {
+                            this._db.Execute(new Sql("ALTER TABLE ec_calendars ALTER COLUMN gcalfeed nvarchar(255) NULL", null));
+                        }
+                        catch (Exception ex) { }
+                        try
+                        {
+                            this._db.Execute(new Sql("ALTER TABLE ec_calendars ADD color nvarchar(255) NULL", null));
+                        }
+                        catch (Exception ex) { }
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altering some fields or ignoring table"));
                     }
                 }
                 catch (Exception ex)
@@ -56,8 +66,12 @@ namespace EventCalendar
                     }
                     else
                     {
-                        int i = this._db.Execute("ALTER TABLE ec_events ALTER COLUMN description ntext", new { });
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altered some fields."));
+                        try
+                        {
+                            this._db.Execute(new Sql("ALTER TABLE ec_events ALTER COLUMN description ntext", null));
+                        }
+                        catch (Exception ex) { }
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altering some fields or ignoring tables."));
                     }
                 }
                 catch (Exception ex)
@@ -76,7 +90,7 @@ namespace EventCalendar
                     }
                     else
                     {
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be meda or no alter table script has been added"));
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be made or no alter table script has been added"));
                     }
                 }
                 catch (Exception ex) { }
@@ -92,7 +106,7 @@ namespace EventCalendar
                     }
                     else
                     {
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be meda or no alter table script has been added"));
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be made or no alter table script has been added"));
                     }
                 }
                 catch (Exception ex)

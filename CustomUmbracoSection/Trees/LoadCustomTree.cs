@@ -192,6 +192,16 @@ namespace EventCalendar.Trees
             xNode.Menu.Add(ActionRefresh.Instance);
 
             tree.Add(xNode);
+
+            //xNode = XmlTreeNode.Create(this);
+            //xNode.NodeID = "3";
+            //xNode.Text = "Settings";
+            //xNode.Action = "javascript:openSettings();";
+            //xNode.Icon = "cog.png";
+            //xNode.NodeType = "GeneralSettings";
+            //xNode.Menu.Clear();
+
+            //tree.Add(xNode);
         }
 
         public override void RenderJS(ref StringBuilder Javascript)
@@ -212,6 +222,10 @@ namespace EventCalendar.Trees
                     }
                     function showRecurringEvents(id) {
                         var url = '/EventCalendar/ECBackendSurface/ShowRecurringEvents/?id=' + id;
+                        UmbClientMgr.contentFrame(url);
+                    }
+                    function openSettings() {
+                        var url = '/EventCalendar/ECBackendSurface/GeneralSettings/';
                         UmbClientMgr.contentFrame(url);
                     }
                 ");

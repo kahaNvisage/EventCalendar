@@ -35,7 +35,13 @@ namespace EventCalendar.Models
 
         [Column("gcalfeed")]
         [Display(Name = "GCal Feed Url")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         [StringLength(255)]
         public string GCalFeedUrl { get; set; }
+
+        [Column("color")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Display(Name = "Event-Color")]
+        public string Color { get; set; }
     }
 }

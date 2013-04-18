@@ -26,7 +26,7 @@
 		<link type="text/css" href="@Url.Content("~/css/EventCalendar/fullcalendar.css")" rel="stylesheet" />
 		<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-1.9.1.min.js")"></script>
 		<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/fullcalendar.min.js")"></script>
-        @if (calendar.IsGCal)
+        @if (null != calendar && calendar.IsGCal)
         {
             <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/gcal.js")"></script>
         }
@@ -34,7 +34,7 @@
 			$(document).ready(function () {
 				$('#calendar').fullCalendar({
 				    events: {
-                        @if (calendar.IsGCal)
+                        @if (null != calendar && calendar.IsGCal)
                         {
                             <text>url: '</text>@calendar.GCalFeedUrl<text>',</text>
                         }

@@ -32,7 +32,7 @@ namespace EventCalendar.Controllers
             {
                 cal = this._db.SingleOrDefault<ECalendar>(id);
             }
-            ViewData["calendar"] = cal;
+            //ViewData["calendar"] = cal;
             return View(cal);
         }
 
@@ -46,7 +46,7 @@ namespace EventCalendar.Controllers
                 //ViewData["calendar"] = calendar;
                 //return PartialView("Index");
             }
-
+            
             TempData["StatusSettings"] = "Valid";
             this._db.Update(calendar);
             //ViewData["calendar"] = calendar;
@@ -252,61 +252,26 @@ namespace EventCalendar.Controllers
         }
 
         [HttpPost]
-        public string GetCalendarEventsAsJson(int id,int start = 0, int end = 0)
+        public string GetCalendarEventsAsJson(int id = 0, int start = 0, int end = 0)
         {
-            DateTime startDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
-            startDate =  startDate.AddSeconds(start);
-            DateTime endDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
-            endDate = endDate.AddSeconds(end);
-
             List<EventsOverviewModel> events = new List<EventsOverviewModel>();
-            List<Schedule> schedules = new List<Schedule>();
-            DateRange range = new DateRange();
-            range.StartDateTime = startDate;
-            range.EndDateTime = endDate;
+            //List<Schedule> schedules = new List<Schedule>();
 
-            //Handle normal events
-            var normal_events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", id).ToList();
-            foreach (var ne in normal_events)
+            if (id != 0)
             {
-                events.Add(
-                    new EventsOverviewModel()
-                    {
-                        type = EventType.Normal,
-                        title = ne.title,
-                        allDay = ne.allDay,
-                        description = ne.description,
-                        end = ne.end,
-                        start = ne.start,
-                        id = ne.Id
-                    });
+                events.AddRange(this.GetNormalEvents(id));
+                events.AddRange(this.GetRecurringEvents(id, start, end));
             }
-
-            //Handle recurring events
-            var recurring_events = this._db.Query<RecurringEvent>("SELECT * FROM ec_recevents WHERE calendarId = @0 ORDER BY id DESC", id).ToList();
-            foreach(var e in recurring_events) {
-                var schedule = new Schedule(
-                    new Event()
-                    {
-                        Title = e.title,
-                        ID = e.Id,
-                        DaysOfWeekOptions = (DayOfWeekEnum)e.day,
-                        FrequencyTypeOptions = (FrequencyTypeEnum)e.frequency,
-                        MonthlyIntervalOptions = (MonthlyIntervalEnum)e.monthly_interval
-                    });
-                foreach (var tmp in schedule.Occurrences(range))
+            else
+            {
+                var calendar = this._db.Query<ECalendar>("SELECT * FROM ec_calendars").ToList();
+                foreach (var cal in calendar)
                 {
-                    events.Add(new EventsOverviewModel()
-                    {
-                        title = e.title,
-                        id = e.Id,
-                        allDay = e.allDay,
-                        description = e.description,
-                        start = tmp,
-                        type = EventType.Recurring
-                    });
+                    events.AddRange(this.GetNormalEvents(cal.Id));
+                    events.AddRange(this.GetRecurringEvents(cal.Id, start, end));
                 }
             }
+            
 
             string json = JsonConvert.SerializeObject(events);
             return json;
@@ -358,6 +323,73 @@ namespace EventCalendar.Controllers
         {
             this._db.Delete<RecurringEvent>(e.Id);
             return RedirectToAction("ShowRecurringEvents", new { id = e.calendarId });
+        }
+
+        private List<EventsOverviewModel> GetNormalEvents(int id)
+        {
+            //Handle normal events
+            List<EventsOverviewModel> events = new List<EventsOverviewModel>();
+            var calendar = this._db.SingleOrDefault<ECalendar>(id);
+            var normal_events = this._db.Query<CalendarEntry>("SELECT * FROM ec_events WHERE calendarId = @0", id).ToList();
+            foreach (var ne in normal_events)
+            {
+                events.Add(
+                    new EventsOverviewModel()
+                    {
+                        type = EventType.Normal,
+                        title = ne.title,
+                        allDay = ne.allDay,
+                        description = ne.description,
+                        end = ne.end,
+                        start = ne.start,
+                        id = ne.Id,
+                        color = !String.IsNullOrEmpty(calendar.Color) ? calendar.Color : ""
+                    });
+            }
+            return events;
+        }
+
+        private List<EventsOverviewModel> GetRecurringEvents(int id, int start = 0, int end = 0)
+        {
+            //Handle recurring events
+            List<EventsOverviewModel> events = new List<EventsOverviewModel>();
+
+            DateTime startDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            startDate = startDate.AddSeconds(start);
+            DateTime endDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            endDate = endDate.AddSeconds(end);
+
+            DateRange range = new DateRange();
+            range.StartDateTime = startDate;
+            range.EndDateTime = endDate;
+
+            var calendar = this._db.SingleOrDefault<ECalendar>(id);
+            var recurring_events = this._db.Query<RecurringEvent>("SELECT * FROM ec_recevents WHERE calendarId = @0 ORDER BY id DESC", id).ToList();
+            foreach(var e in recurring_events) {
+                var schedule = new Schedule(
+                    new Event()
+                    {
+                        Title = e.title,
+                        ID = e.Id,
+                        DaysOfWeekOptions = (DayOfWeekEnum)e.day,
+                        FrequencyTypeOptions = (FrequencyTypeEnum)e.frequency,
+                        MonthlyIntervalOptions = (MonthlyIntervalEnum)e.monthly_interval
+                    });
+                foreach (var tmp in schedule.Occurrences(range))
+                {
+                    events.Add(new EventsOverviewModel()
+                    {
+                        title = e.title,
+                        id = e.Id,
+                        allDay = e.allDay,
+                        description = e.description,
+                        start = tmp,
+                        type = EventType.Recurring,
+                        color = !String.IsNullOrEmpty(calendar.Color) ? calendar.Color : ""
+                    });
+                }
+            }
+            return events;
         }
     }
 }

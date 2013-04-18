@@ -4,11 +4,45 @@
 @using System.Globalization
 
 <link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
+<link type="text/css" href="@Url.Content("~/css/EventCalendar/colorpicker.css")" rel="stylesheet" />
+<style>
+    #colorSelector
+    {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        background: url(/css/EventCalendar/images/select.png);
+    }
+    #colorSelector div {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 30px;
+        height: 30px;
+        background: url(../images/select.png) center;
+    }
+</style>
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-1.9.1.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/bootstrap.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/colorpicker.js")"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $(".alert").alert();
+        $('#colorSelector').ColorPicker({
+            color: '#0000ff',
+            onShow: function (colpkr) {
+                $(colpkr).fadeIn(500);
+                return false;
+            },
+            onHide: function (colpkr) {
+                $(colpkr).fadeOut(500);
+                return false;
+            },
+            onChange: function (hsb, hex, rgb) {
+                $('#color_field').val('#'+hex);
+                $('#colorSelector div').css('background-color', '#' + hex);
+            }
+        });
     });
 </script>
 
@@ -28,7 +62,7 @@
                 Settings saved! <a class="close" data-dismiss="alert" href="#">&times;</a>
             </div>
         }
-        <form action="http://localhost:33314/umbraco/EventCalendar/ECBackendSurface/EditCalendar"
+        <form action="~/umbraco/EventCalendar/ECBackendSurface/EditCalendar"
         enctype="multipart/form-data" method="post" class="form-horizontal">
         @Html.HiddenFor(x => x.Id)
         <div class="control-group">
@@ -57,6 +91,13 @@
             <div class="controls">
                 @Html.CheckBoxFor(x => x.DisplayOnSite)
                 @Html.HiddenFor(x => x.DisplayOnSite)
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(x => x.Color, new { @class = "control-label" })
+            <div class="controls">
+                @Html.HiddenFor(x => x.Color, new { id = "color_field" })
+                <div id="colorSelector"><div style="background-color: @if(String.IsNullOrEmpty(Model.Color)){ <text>#0000ff</text>} else { @Model.Color}"></div></div>
             </div>
         </div>
         <div class="control-group">

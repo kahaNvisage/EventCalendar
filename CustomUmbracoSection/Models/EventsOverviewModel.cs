@@ -17,6 +17,7 @@ namespace EventCalendar.Models
         public DateTime? end { get; set; }
         public bool allDay { get; set; }
         public string description { get; set; }
+        public string color { get; set; }
         public EventType type { get; set; }
     }
 }

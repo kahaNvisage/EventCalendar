@@ -19,7 +19,7 @@ namespace EventCalendar
         {
             if (!IsPostBack)
             {
-                this.DropDownList1.Items.Add("Not selected");
+                this.DropDownList1.Items.Add(new ListItem() { Text = "No specific calendar", Value = "0" });
                 this.Calendar = ApplicationContext.Current.DatabaseContext.Database.Query<ECalendar>("SELECT * FROM ec_calendars").ToList();
 
                 foreach (ECalendar cal in this.Calendar)

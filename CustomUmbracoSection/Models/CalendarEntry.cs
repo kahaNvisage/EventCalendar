@@ -38,6 +38,10 @@ namespace EventCalendar.Models
 
         [Column("description")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string description { get; set; }
+
+        //[Column("allowbookings")]
+        //public bool allowBookings { get; set; }
     }
 }
