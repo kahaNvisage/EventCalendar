@@ -66,7 +66,7 @@
         <div class="row-fluid">
             <hr />
             <div class="span12" id="description">
-                @Html.Raw(Model.Description)
+                @Html.Raw(Model.GetDescription(CultureInfo.CurrentCulture.ToString()))
             </div>
         </div>
     </div>

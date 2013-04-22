@@ -172,7 +172,9 @@
     <Compile Include="Models\AddEventModel.cs" />
     <Compile Include="Models\ECalendar.cs" />
     <Compile Include="Models\CalendarEntry.cs" />
+    <Compile Include="Models\EditDescriptionModel.cs" />
     <Compile Include="Models\EditEventModel.cs" />
+    <Compile Include="Models\EventDesciption.cs" />
     <Compile Include="Models\EventDetailsModel.cs" />
     <Compile Include="Models\EventLocation.cs" />
     <Compile Include="Models\EventsOverviewModel.cs" />

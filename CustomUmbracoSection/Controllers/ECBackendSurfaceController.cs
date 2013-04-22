@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 using Newtonsoft.Json;
 using ScheduleWidget.Enums;
 using ScheduleWidget.ScheduledEvents;
+using Umbraco.Core.Models;
 
 namespace EventCalendar.Controllers
 {
@@ -158,7 +159,17 @@ namespace EventCalendar.Controllers
             {
                 eem.end = (DateTime)entry.end;
             }
+            //Get Descriptions for Event
+            Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0",id).ToDictionary(x => x.CultureCode);
+            List<ILanguage> languages = Services.LocalizationService.GetAllLanguages().ToList();
+            foreach (var lang in languages)
+            {
+                if(!descriptions.ContainsKey(lang.CultureInfo.ToString())){
+                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = eem.Id, Id = 0 });
+                }
+            }
 
+            eem.Descriptions = descriptions;
             
             return PartialView("EditEventForm",eem);
         }
@@ -166,10 +177,25 @@ namespace EventCalendar.Controllers
         [HttpPost]
         public ActionResult EditEventForm(EditEventModel e)
         {
+            //Get locations
             List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
             locations.Insert(0, new EventLocation() { LocationName = "No Location", Id = 0 });
             SelectList list = new SelectList(locations, "Id", "LocationName", e.selectedLocation);
             e.locations = list;
+
+            //Get Descriptions for Event
+            Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0", e.Id).ToDictionary(x => x.CultureCode);
+            List<ILanguage> languages = Services.LocalizationService.GetAllLanguages().ToList();
+            foreach (var lang in languages)
+            {
+                if (!descriptions.ContainsKey(lang.CultureInfo.ToString()))
+                {
+                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = e.Id, Id = 0 });
+                }
+            }
+
+            e.Descriptions = descriptions;
+
             if (!ModelState.IsValid)
             {
                 TempData["StatusEditEvent"] = "Invalid";
@@ -323,6 +349,28 @@ namespace EventCalendar.Controllers
         {
             this._db.Delete<RecurringEvent>(e.Id);
             return RedirectToAction("ShowRecurringEvents", new { id = e.calendarId });
+        }
+
+        [HttpPost]
+        public ActionResult SaveEventDescription(EditDescriptionModel edm)
+        {
+            EventDesciption ed = new EventDesciption()
+            {
+                Content = edm.content,
+                CultureCode = edm.culture,
+                EventId = edm.eventid
+            };
+            if (edm.id != 0)
+            {
+                ed.Id = edm.id;
+                this._db.Update(ed);
+            }
+            else
+            {
+                this._db.Insert(ed);
+            }
+            
+            return RedirectToAction("EditEventForm", new { id = edm.eventid });
         }
 
         private List<EventsOverviewModel> GetNormalEvents(int id)

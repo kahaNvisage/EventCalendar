@@ -53,7 +53,19 @@
     </div>
 }
 
-<form action="~/umbraco/EventCalendar/ECBackendSurface/EditEventForm" enctype="multipart/form-data" method="post" class="form-horizontal">
+<ul class="nav nav-tabs" id="myTab">
+  <li class="active"><a href="#home" data-toggle="tab">General Settings</a></li>
+  @foreach (var lang in Model.Descriptions)
+  {
+      <li>
+        <a href="#@lang.Key" data-toggle="tab">@CultureInfo.GetCultureInfo(lang.Key).DisplayName</a>
+      </li>
+  }
+</ul>
+ 
+<div class="tab-content">
+  <div class="tab-pane active" id="home">
+      <form action="~/umbraco/EventCalendar/ECBackendSurface/EditEventForm" enctype="multipart/form-data" method="post" class="form-horizontal">
     <fieldset>
     @Html.HiddenFor(x => x.Id)
     @Html.HiddenFor(x => x.calendarId)
@@ -92,16 +104,31 @@
         </div>
     </div>
     <div class="control-group">
-        @Html.LabelFor(x => x.description, new { @class = "control-label" })
-        <div class="controls">
-            @Html.TextAreaFor(x => x.description, new { @class = "ckeditor" })
-        </div>
-        @Html.ValidationMessageFor(x => x.description)
-    </div>
-    <div class="control-group">
         <div class="controls">
             <input type="submit" value="Save" class="btn btn-primary">
         </div>
     </div>
     </fieldset>
 </form>
+  </div>
+  @foreach (KeyValuePair<string,EventCalendar.Models.EventDesciption> desc in Model.Descriptions)
+  {
+      <div class="tab-pane" id="@desc.Key">
+        <form action="~/umbraco/EventCalendar/ECBackendSurface/SaveEventDescription" enctype="multipart/form-data" method="post" class="form">
+            <input type="hidden" name="eventid" value="@desc.Value.EventId" />
+            <input type="hidden" name="id" value="@desc.Value.Id" />
+            <input type="hidden" name="culture" value="@desc.Value.CultureCode" />
+            <div class="control-group">
+                <div class="controls">
+                    @Html.TextArea("content", @desc.Value.Content ,new { @class = "ckeditor" })
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" value="Save" class="btn btn-primary">
+                </div>
+            </div>
+        </form>
+      </div>
+  }
+</div>

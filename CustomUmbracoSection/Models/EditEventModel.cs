@@ -35,7 +35,6 @@ namespace EventCalendar.Models
         [Display(Name = "Is all day?")]
         public bool allday { get; set; }
 
-        [Required]
         [Display(Name = "Description")]
         [DataType(DataType.Html)]
         [AllowHtml]
@@ -46,5 +45,7 @@ namespace EventCalendar.Models
 
         [Display(Name = "Location")]
         public SelectList locations { get; set; }
+
+        public Dictionary<string, EventDesciption> Descriptions { get; set; }
     }
 }

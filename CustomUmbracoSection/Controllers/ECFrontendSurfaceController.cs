@@ -16,6 +16,13 @@ namespace EventCalendar.Controllers
     [PluginController("EventCalendar")]
     public class ECFrontendSurfaceController : SurfaceController
     {
+        UmbracoDatabase _db;
+
+        public ECFrontendSurfaceController()
+        {
+            this._db = ApplicationContext.DatabaseContext.Database;
+        }
+
         [ChildActionOnly]
         public ActionResult GetEventDetails(int id, int type = 0)
         {
@@ -24,17 +31,23 @@ namespace EventCalendar.Controllers
 
             if (type == 0)
             {
-                CalendarEntry e = ApplicationContext.DatabaseContext.Database.Single<CalendarEntry>("SELECT * FROM ec_events WHERE id=@0", id);
+                //Fetch Event
+                CalendarEntry e = this._db.Single<CalendarEntry>("SELECT * FROM ec_events WHERE id=@0", id);
+                //If it has a locatuion fetch it
                 if (e.locationId != 0)
                 {
-                    l = ApplicationContext.DatabaseContext.Database.Single<EventLocation>("SELECT * FROM ec_locations WHERE id = @0", e.locationId);
+                    l = this._db.Single<EventLocation>("SELECT * FROM ec_locations WHERE id = @0", e.locationId);
                 }
+                //Fetch all Descriptions
+                Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0", id).ToDictionary(x => x.CultureCode);
+
                 evm = new EventDetailsModel()
                 {
                     Title = e.title,
                     Description = e.description,
                     LocationId = e.locationId,
-                    Location = l
+                    Location = l,
+                    Descriptions = descriptions
                 };
                 if (null != e.start)
                 {

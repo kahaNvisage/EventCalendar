@@ -12,7 +12,20 @@ namespace EventCalendar.Models
         public string StartDate { get; set; }
         public string EndDate { get; set; }
         public string Description { get; set; }
-        public int LocationId { get; set; }
+        public int LocationId { get; set; }        
         public EventLocation Location { get; set; }
+        public Dictionary<string, EventDesciption> Descriptions { get; set; }
+
+        public string GetDescription(string culture)
+        {
+            if (this.Descriptions.ContainsKey(culture))
+            {
+                return this.Descriptions[culture].Content;
+            }
+            else
+            {
+                return "";
+            }
+        }
     }
 }
