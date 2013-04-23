@@ -168,9 +168,23 @@ namespace EventCalendar.Controllers
                     descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = eem.Id, Id = 0 });
                 }
             }
-
             eem.Descriptions = descriptions;
-            
+
+            //Get custom properties
+            var all_custom = this._db.Query<DynamicPropertyField>("SELECT * FROM ec_dynamicpropertyfields WHERE type = @0", DynamicPropertyType.Event).ToDictionary(x => x.Name);
+            var current_event_properties = this._db.Query<DynamicProperty>("SELECT ec_dynamicproperties.*,ec_dynamicpropertyfields.name, ec_dynamicpropertyfields.valuetype FROM ec_dynamicproperties INNER JOIN ec_dynamicpropertyfields ON (ec_dynamicproperties.fieldid = ec_dynamicpropertyfields.id) WHERE ec_dynamicproperties.owner = @0", id).ToDictionary(x => x.Name);
+            foreach (var f in all_custom)
+            {
+                if (current_event_properties.Keys.Contains(f.Key))
+                {
+                    eem.SetMember(f.Key, current_event_properties[f.Key]);
+                }
+                else
+                {
+                    eem.SetMember(f.Key, new DynamicProperty() { Name = f.Key, Value = String.Empty, ValueType = f.Value.ValueType, FieldId = f.Value.Id });
+                }
+            }
+
             return PartialView("EditEventForm",eem);
         }
 
@@ -193,8 +207,7 @@ namespace EventCalendar.Controllers
                     descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = e.Id, Id = 0 });
                 }
             }
-
-            e.Descriptions = descriptions;
+            e.Descriptions = descriptions;            
 
             if (!ModelState.IsValid)
             {
@@ -213,10 +226,55 @@ namespace EventCalendar.Controllers
                 Id = e.Id,
                 locationId = e.selectedLocation
             };
+            //Update the event
             this._db.Update(entry);
+
+            //Update dynamic properties
+            foreach (var name in e.GetDynamicMemberNames())
+            {
+                try
+                {
+                    DynamicPropertyField field = this._db.Single<DynamicPropertyField>("SELECT * FROM ec_dynamicpropertyfields WHERE type = @0 AND name = @1", DynamicPropertyType.Event, name);
+                    string value = e.GetMember(name).ToString();
+                    DynamicProperty prop = new DynamicProperty()
+                    {
+                        Owner = e.Id,
+                        FieldId = field.Id,
+                        Value = value
+                    };
+                    DynamicProperty test = this._db.SingleOrDefault<DynamicProperty>("SELECT * FROM ec_dynamicproperties WHERE fieldid = @0 AND owner = @1", field.Id, e.Id);
+                    if (null != test)
+                    {
+                        test.Value = value;
+                        this._db.Update(test);
+                    }
+                    else
+                    {
+                        this._db.Insert(prop);
+                    }
+                }
+                catch (Exception ex) { }
+            }
+
+            //Get custom properties from db
+            var all_custom = this._db.Query<DynamicPropertyField>("SELECT * FROM ec_dynamicpropertyfields WHERE type = @0", DynamicPropertyType.Event).ToDictionary(x => x.Name);
+            var current_event_properties = this._db.Query<DynamicProperty>("SELECT ec_dynamicproperties.*,ec_dynamicpropertyfields.name, ec_dynamicpropertyfields.valuetype FROM ec_dynamicproperties INNER JOIN ec_dynamicpropertyfields ON (ec_dynamicproperties.fieldid = ec_dynamicpropertyfields.id) WHERE ec_dynamicproperties.owner = @0", e.Id).ToDictionary(x => x.Name);
+            foreach (var f in all_custom)
+            {
+                if (current_event_properties.Keys.Contains(f.Key))
+                {
+                    e.SetMember(f.Key, current_event_properties[f.Key]);
+                }
+                else
+                {
+                    e.SetMember(f.Key, new DynamicProperty() { Name = f.Key, Value = String.Empty, ValueType = f.Value.ValueType });
+                }
+            }
+
             return PartialView("EditEventForm",e);
         }
 
+        [HttpGet]
         public ActionResult EditRecurringEvent(int id = 0)
         {
             List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
@@ -371,6 +429,86 @@ namespace EventCalendar.Controllers
             }
             
             return RedirectToAction("EditEventForm", new { id = edm.eventid });
+        }
+
+        [HttpGet]
+        public ActionResult DynamicPropertiesEvents(int id = 0)
+        {
+            EditDynamicFieldModel edfm = null;
+            List<DynamicPropertyField> dep = this._db.Query<DynamicPropertyField>("SELECT * FROM ec_dynamicpropertyfields WHERE type = @0", DynamicPropertyType.Event).ToList();
+            if (id == 0)
+            {
+                edfm = new EditDynamicFieldModel()
+                {
+                    Id = 0,
+                    Fields = dep,
+                    Name = String.Empty,
+                    SelectedType = (int)DynamicPropertyType.Event,
+                    ValueTypes = new SelectList(
+                        (Enum.GetValues(typeof(DynamicPropertyValueType))
+                        .Cast<int>()
+                        .Select(enu => new SelectListItem() { Text = Enum.GetName(typeof(DynamicPropertyValueType), enu), Value = enu.ToString() })
+                        ).ToList(),"Value","Text"),
+                    SelectedValueType = (int)DynamicPropertyValueType.Textstring
+                };
+            }
+            else
+            {
+                var field = this._db.Single<DynamicPropertyField>(id);
+                edfm = new EditDynamicFieldModel()
+                {
+                    Id = field.Id,
+                    SelectedType = field.Type,
+                    SelectedValueType = field.ValueType,
+                    Name = field.Name,
+                    ValueTypes = new SelectList(
+                        (Enum.GetValues(typeof(DynamicPropertyValueType))
+                        .Cast<int>()
+                        .Select(enu => new SelectListItem() { Text = Enum.GetName(typeof(DynamicPropertyValueType), enu), Value = enu.ToString() })
+                        ).ToList(), "Value", "Text",field.ValueType),
+                    Fields = dep
+                };
+            }
+            return View("DynamicEventProperties",edfm);
+        }
+
+        [HttpPost]
+        public ActionResult DynamicPropertiesEvents(EditDynamicFieldModel edfm)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["StatusCreateProperty"] = "Invalid";
+                return View("DynamicEventProperties", edfm);
+            }
+
+            TempData["StatusCreateProperty"] = "Valid";
+            if (edfm.Id == 0)
+            {
+                this._db.Insert(new DynamicPropertyField()
+                {
+                    Name = edfm.Name,
+                    Type = edfm.SelectedType,
+                    ValueType = edfm.SelectedValueType
+                });
+            }
+            else
+            {
+                this._db.Update(new DynamicPropertyField()
+                {
+                    Name = edfm.Name,
+                    Id = edfm.Id,
+                    Type = edfm.SelectedType,
+                    ValueType = edfm.SelectedValueType
+                });
+            }
+            return RedirectToAction("DynamicPropertiesEvents", new { id = 0 });
+        }
+
+        [HttpGet]
+        public ActionResult DeleteDynamicProperty(int id)
+        {
+            this._db.Delete<DynamicPropertyField>(id);
+            return RedirectToAction("DynamicPropertiesEvents");
         }
 
         private List<EventsOverviewModel> GetNormalEvents(int id)

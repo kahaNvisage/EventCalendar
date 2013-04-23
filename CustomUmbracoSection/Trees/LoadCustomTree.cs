@@ -67,6 +67,8 @@ namespace EventCalendar.Trees
                     case "CalendarBase": this.RenderCalendar(ref tree); break;
                     case "LocationBase": RenderLocations(ref tree); break;
                     case "CalendarEntry": RenderCalendarEntryNodes(ref tree, id); break;
+                    case "ECGeneralSettings": RenderGeneralSettings(ref tree); break;
+                    case "DynamicProperties": RenderDynamicProperties(ref tree); break;
                 }
             }
         }
@@ -151,6 +153,48 @@ namespace EventCalendar.Trees
             }
         }
 
+        private void RenderGeneralSettings(ref XmlTree tree)
+        {
+            XmlTreeNode node = XmlTreeNode.Create(this);
+            node.NodeType = "DynmaicProperties";
+            node.Text = "Custom Properties";
+            node.Icon = "developerMacro.gif";
+            //node.Action = "javascript:openCalendar(" + id.ToString() + ")";
+            node.Menu.Clear();
+
+            var treeService = new TreeService(-1, TreeAlias, ShowContextMenu, IsDialog, DialogMode, app, "DynamicProperties");
+            node.Source = treeService.GetServiceUrl();
+
+            tree.Add(node);
+        }
+
+        private void RenderDynamicProperties(ref XmlTree tree)
+        {
+            XmlTreeNode node = XmlTreeNode.Create(this);
+            node.NodeType = "DynamicEventProperties";
+            node.Text = "Events";
+            node.Icon = "developerMacro.gif";
+            node.Action = "javascript:openDynPropEvents()";
+            node.Menu.Clear();
+            tree.Add(node);
+
+            node = XmlTreeNode.Create(this);
+            node.NodeType = "DynamicCalendarProperties";
+            node.Text = "Calendar";
+            node.Icon = "developerMacro.gif";
+            node.Action = "javascript:openDynPropCalendar()";
+            node.Menu.Clear();
+            tree.Add(node);
+
+            node = XmlTreeNode.Create(this);
+            node.NodeType = "DynamicLocationProperties";
+            node.Text = "Locations";
+            node.Icon = "developerMacro.gif";
+            node.Action = "javascript:openDynPropLocations()";
+            node.Menu.Clear();
+            tree.Add(node);
+        }
+
         /// <summary>
         /// Render the top Root Nodes.
         /// - Calendar -> The Root of all Calendars
@@ -193,15 +237,19 @@ namespace EventCalendar.Trees
 
             tree.Add(xNode);
 
-            //xNode = XmlTreeNode.Create(this);
-            //xNode.NodeID = "3";
-            //xNode.Text = "Settings";
+            xNode = XmlTreeNode.Create(this);
+            xNode.NodeID = "3";
+            xNode.Text = "Settings";
             //xNode.Action = "javascript:openSettings();";
-            //xNode.Icon = "cog.png";
-            //xNode.NodeType = "GeneralSettings";
-            //xNode.Menu.Clear();
+            xNode.Icon = "cog.png";
+            xNode.NodeType = "ECGeneralSettings";
 
-            //tree.Add(xNode);
+            treeService = new TreeService(-1, TreeAlias, ShowContextMenu, IsDialog, DialogMode, app, "ECGeneralSettings");
+            xNode.Source = treeService.GetServiceUrl();
+
+            xNode.Menu.Clear();
+
+            tree.Add(xNode);
         }
 
         public override void RenderJS(ref StringBuilder Javascript)
@@ -224,8 +272,8 @@ namespace EventCalendar.Trees
                         var url = '/EventCalendar/ECBackendSurface/ShowRecurringEvents/?id=' + id;
                         UmbClientMgr.contentFrame(url);
                     }
-                    function openSettings() {
-                        var url = '/EventCalendar/ECBackendSurface/GeneralSettings/';
+                    function openDynPropEvents() {
+                        var url = '/EventCalendar/ECBackendSurface/DynamicPropertiesEvents/';
                         UmbClientMgr.contentFrame(url);
                     }
                 ");

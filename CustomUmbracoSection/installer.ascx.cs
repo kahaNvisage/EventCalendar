@@ -130,6 +130,38 @@ namespace EventCalendar
                 }
                 catch (Exception ex) { this.BulletedList1.Items.Add(new ListItem(ex.Message)); }
 
+                //Creating DynamicPropertyFields table
+                try
+                {
+                    this.BulletedList1.Items.Add(new ListItem("Creating dynamic property fields table."));
+                    if (!this._db.TableExist("ec_dynamicpropertyfields"))
+                    {
+                        this._db.CreateTable<DynamicPropertyField>(false);
+                        this.BulletedList1.Items.Add(new ListItem("Successfully created table."));
+                    }
+                    else
+                    {
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be made or no alter table script has been added"));
+                    }
+                }
+                catch (Exception ex) { this.BulletedList1.Items.Add(new ListItem(ex.Message)); }
+
+                //Creating DynamicProperties table
+                try
+                {
+                    this.BulletedList1.Items.Add(new ListItem("Creating dynamic properties table."));
+                    if (!this._db.TableExist("ec_dynamicproperties"))
+                    {
+                        this._db.CreateTable<DynamicProperty>(false);
+                        this.BulletedList1.Items.Add(new ListItem("Successfully created table."));
+                    }
+                    else
+                    {
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be made or no alter table script has been added"));
+                    }
+                }
+                catch (Exception ex) { this.BulletedList1.Items.Add(new ListItem(ex.Message)); }
+
                 this.BulletedList1.Items.Add(new ListItem("Done creating tables."));
             }
             else

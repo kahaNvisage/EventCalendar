@@ -1,6 +1,7 @@
-﻿@model EventCalendar.Models.EditEventModel
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<EventCalendar.Models.EditEventModel>
 @using System.Web.Mvc.Html
 @using System.Globalization
+@using EventCalendar.Models
 
 <link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
 <link type="text/css" href="@Url.Content("~/css/EventCalendar/jquery-ui-1.10.2.custom.min.css")" rel="stylesheet" />
@@ -67,48 +68,72 @@
   <div class="tab-pane active" id="home">
       <form action="~/umbraco/EventCalendar/ECBackendSurface/EditEventForm" enctype="multipart/form-data" method="post" class="form-horizontal">
     <fieldset>
-    @Html.HiddenFor(x => x.Id)
-    @Html.HiddenFor(x => x.calendarId)
-    <div class="control-group">
-        @Html.LabelFor(x => x.title, new { @class = "control-label" })
-        <div class="controls">
-            @Html.TextBoxFor(x => x.title)
+        @Html.HiddenFor(x => x.Id)
+        @Html.HiddenFor(x => x.calendarId)
+        <legend>General properties</legend>
+        <div class="control-group">
+            @Html.LabelFor(x => x.title, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(x => x.title)
+            </div>
+            @Html.ValidationMessageFor(x => x.title)
         </div>
-        @Html.ValidationMessageFor(x => x.title)
-    </div>
-    <div class="control-group">
-        @Html.LabelFor(x => x.allday, new { @class = "control-label" })
-        <div class="controls">
-            @Html.CheckBoxFor(x => x.allday)
+        <div class="control-group">
+            @Html.LabelFor(x => x.allday, new { @class = "control-label" })
+            <div class="controls">
+                @Html.CheckBoxFor(x => x.allday)
+            </div>
+            @Html.ValidationMessageFor(x => x.allday)
         </div>
-        @Html.ValidationMessageFor(x => x.allday)
-    </div>
-    <div class="control-group">
-        @Html.LabelFor(x => x.start, new { @class = "control-label" })
-        <div class="controls">
-            @Html.TextBoxFor(x => x.start, new { @readonly = "readonly", size = "16", @class = "form_datetime1" })
+        <div class="control-group">
+            @Html.LabelFor(x => x.start, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(x => x.start, new { @readonly = "readonly", size = "16", @class = "form_datetime1" })
+            </div>
+            @Html.ValidationMessageFor(x => x.start)
         </div>
-        @Html.ValidationMessageFor(x => x.start)
-    </div>
-    <div class="control-group">
-        @Html.LabelFor(x => x.end, new { @class = "control-label" })
-        <div class="controls">
-            @Html.TextBoxFor(x => x.end, new { @readonly = "readonly", size = "16", @class = "form_datetime2" })
+        <div class="control-group">
+            @Html.LabelFor(x => x.end, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(x => x.end, new { @readonly = "readonly", size = "16", @class = "form_datetime2" })
+            </div>
+            @Html.ValidationMessageFor(x => x.end)
         </div>
-        @Html.ValidationMessageFor(x => x.end)
-    </div>
-    <div class="control-group">
-        @Html.LabelFor(x => x.locations, new { @class = "control-label" })
-        <div class="controls">
-            @Html.DropDownListFor(x => x.selectedLocation, Model.locations)
+        <div class="control-group">
+            @Html.LabelFor(x => x.locations, new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownListFor(x => x.selectedLocation, Model.locations)
+            </div>
         </div>
-    </div>
+    </fieldset>
+    <fieldset>
+        <legend>Custom properties</legend>
+        @foreach (var member_name in Model.GetDynamicMemberNames())
+        {
+            <div class="control-group">
+                @Html.Label(member_name, new { @class = "control-label" })
+                <div class="controls">
+                    @{
+                        dynamic member = Model.GetMember(member_name);
+                        if(member.ValueType == (int)DynamicPropertyValueType.Textstring) {
+                            string value = member.Value.ToString();
+                            @Html.TextBox(member_name, value)
+                        }
+                        else if (member.ValueType == (int)DynamicPropertyValueType.Boolean)
+                        {
+                            bool value = (!String.IsNullOrEmpty(member.Value.ToString())) ? Convert.ToBoolean(member.Value.ToString()) : false;
+                            @Html.CheckBox(member_name,value)
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </fieldset>
     <div class="control-group">
         <div class="controls">
             <input type="submit" value="Save" class="btn btn-primary">
         </div>
     </div>
-    </fieldset>
 </form>
   </div>
   @foreach (KeyValuePair<string,EventCalendar.Models.EventDesciption> desc in Model.Descriptions)

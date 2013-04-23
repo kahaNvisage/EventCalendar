@@ -130,7 +130,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\CreateRecurringEvent.cs" />
+    <Compile Include="AppStart.cs" />
     <Compile Include="Controllers\ECBackendSurfaceController.cs" />
     <Compile Include="Controllers\ECFrontendSurfaceController.cs" />
     <Compile Include="dashboard.ascx.cs">
@@ -162,6 +162,7 @@
     <Compile Include="EventCalendarSelector.ascx.designer.cs">
       <DependentUpon>EventCalendarSelector.ascx</DependentUpon>
     </Compile>
+    <Compile Include="EventModelBinder.cs" />
     <Compile Include="installer.ascx.cs">
       <DependentUpon>installer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -170,9 +171,11 @@
       <DependentUpon>installer.ascx</DependentUpon>
     </Compile>
     <Compile Include="Models\AddEventModel.cs" />
+    <Compile Include="Models\DynamicProperty.cs" />
     <Compile Include="Models\ECalendar.cs" />
     <Compile Include="Models\CalendarEntry.cs" />
     <Compile Include="Models\EditDescriptionModel.cs" />
+    <Compile Include="Models\EditDynamicFieldModel.cs" />
     <Compile Include="Models\EditEventModel.cs" />
     <Compile Include="Models\EventDesciption.cs" />
     <Compile Include="Models\EventDetailsModel.cs" />
@@ -235,6 +238,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ECBackendSurface\DeleteRecurringEvent.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ECBackendSurface\DynamicEventProperties.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
