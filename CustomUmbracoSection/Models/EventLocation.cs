@@ -46,9 +46,11 @@ namespace EventCalendar.Models
         public string Country { get; set; }
 
         [Column("latitude")]
+        [Required]
         public string lat { get; set; }
 
         [Column("longitude")]
+        [Required]
         public string lon { get; set; }
     }
 }

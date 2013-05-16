@@ -65,11 +65,6 @@ namespace EventCalendar.Models
         [Display(Name = "Is all day?")]
         public bool allDay { get; set; }
 
-        [Display(Name = "Description")]
-        [DataType(DataType.Html)]
-        [AllowHtml]
-        public string description { get; set; }
-
         [Display(Name = "Day of the event")]
         public DayOfWeekEnum day { get; set; }
 
@@ -87,5 +82,7 @@ namespace EventCalendar.Models
 
         [HiddenInput]
         public int calendar { get; set; }
+
+        public Dictionary<string, EventDesciption> Descriptions { get; set; }
     }
 }

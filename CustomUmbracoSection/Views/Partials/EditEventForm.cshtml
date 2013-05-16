@@ -118,6 +118,8 @@
             <input type="hidden" name="eventid" value="@desc.Value.EventId" />
             <input type="hidden" name="id" value="@desc.Value.Id" />
             <input type="hidden" name="culture" value="@desc.Value.CultureCode" />
+            <input type="hidden" name="type" value="@desc.Value.Type" />
+            <input type="hidden" name="calendarid" value="@desc.Value.CalendarId" />
             <div class="control-group">
                 <div class="controls">
                     @Html.TextArea("content", @desc.Value.Content ,new { @class = "ckeditor" })

@@ -11,11 +11,20 @@ namespace EventCalendar.Models
     {
         [Required]
         public int id {get;set;}
+
         [Required]
         public int eventid {get;set;}
+
+        [Required]
+        public int type { get; set; }
+
+        [Required]
+        public int calendarid { get; set; }
+
         [Required]
         [AllowHtml]
         public string content{get;set;}
+
         [Required]
         public string culture { get; set; }
     }

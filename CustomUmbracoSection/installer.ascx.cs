@@ -71,7 +71,7 @@ namespace EventCalendar
                             this._db.Execute(new Sql("ALTER TABLE ec_events ALTER COLUMN description ntext", null));
                         }
                         catch (Exception ex) { }
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altering some fields or ignoring tables."));
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altering some fields or ignoring table."));
                     }
                 }
                 catch (Exception ex)
@@ -125,7 +125,12 @@ namespace EventCalendar
                     }
                     else
                     {
-                        this.BulletedList1.Items.Add(new ListItem("Database already exists. No changes have to be made or no alter table script has been added"));
+                        try
+                        {
+                            this._db.Execute(new Sql("ALTER TABLE ec_eventdescriptions ALTER COLUMN content ntext", null));
+                        }
+                        catch (Exception ex) { }
+                        this.BulletedList1.Items.Add(new ListItem("Database already exists. Altering some fields or ignoring table."));
                     }
                 }
                 catch (Exception ex) { this.BulletedList1.Items.Add(new ListItem(ex.Message)); }

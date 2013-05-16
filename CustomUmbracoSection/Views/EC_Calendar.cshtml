@@ -2,7 +2,11 @@
 @using EventCalendar
 @{
     Layout = "";
-    var calendar = EventCalendarApp.GetCalendar(Convert.ToInt32(Model.Content.GetProperty("calendar").Value));
+    int id = 0;
+    try{
+        id = Convert.ToInt32(Model.Content.GetProperty("calendar").Value);
+    }catch(Exception ex){}
+    var calendar = EventCalendarApp.GetCalendar(id);
 }
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -58,9 +62,9 @@
                             return false;
                         } else {
                             if(event.type == 1) {
-                                window.location.href = '@Model.Content.Down().Url?id='+event.id+'&type=1';
+                                window.location.href = '@Model.Content.Down().Url?id='+event.id+'&type=1&calendar='+event.calendar;
                             } else {
-                                window.location.href = '@Model.Content.Down().Url?id='+event.id+'&amp;type=0';
+                                window.location.href = '@Model.Content.Down().Url?id='+event.id+'&type=0&calendar='+event.calendar;
                             }
                             return false;
                         }

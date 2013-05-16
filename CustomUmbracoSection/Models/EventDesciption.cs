@@ -25,6 +25,16 @@ namespace EventCalendar.Models
         [Required]
         public int EventId { get; set; }
 
+        [Column("type")]
+        [HiddenInput(DisplayValue = false)]
+        [Required]
+        public int Type { get; set; }
+
+        [Column("calendarid")]
+        [HiddenInput(DisplayValue = false)]
+        [Required]
+        public int CalendarId { get; set; }
+
         [Column("culture")]
         [StringLength(5)]
         [Required]
@@ -32,6 +42,7 @@ namespace EventCalendar.Models
 
         [Column("content")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
         [AllowHtml]
         public string Content { get; set; }
     }

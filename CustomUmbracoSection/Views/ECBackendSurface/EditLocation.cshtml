@@ -2,11 +2,13 @@
 @using System.Web.Mvc.Html
 @using System.Globalization
 
+@{
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true;   
+}
+
 <link type="text/css" href="@Url.Content("~/css/EventCalendar/bootstrap.css")" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="@Url.Content("~/css/EventCalendar/jquery-gmaps-latlon-picker.css")"/>
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery-1.9.1.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.min.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/jquery.validate.unobtrusive.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/scripts/EventCalendar/bootstrap.min.js")"></script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <script src="@Url.Content("~/scripts/EventCalendar/jquery-gmaps-latlon-picker.js")"></script>
@@ -40,7 +42,7 @@
 }
 </div>
 
-<form action="~/umbraco/EventCalendar/ECBackendSurface/EditLocation" enctype="multipart/form-data" method="post" class="form-horizontal">
+<form action="~/umbraco/EventCalendar/ECBackendSurface/EditLocation" enctype="multipart/form-data" method="post" class="form-horizontal" id="mainform">
     <fieldset>
     @Html.HiddenFor(x => x.Id)
     <div class="control-group">

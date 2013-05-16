@@ -19,5 +19,6 @@ namespace EventCalendar.Models
         public string description { get; set; }
         public string color { get; set; }
         public EventType type { get; set; }
+        public int calendar { get; set; }
     }
 }

@@ -26,6 +26,11 @@ namespace EventCalendar.Controllers
             this._db = context.Application.DatabaseContext.Database;
         }
 
+        /// <summary>
+        /// Get calendar infos for editing
+        /// </summary>
+        /// <param name="id">Id of the calendar</param>
+        /// <returns></returns>
         public ActionResult Index(int id = 0)
         {
             ECalendar cal = null;
@@ -37,6 +42,11 @@ namespace EventCalendar.Controllers
             return View(cal);
         }
 
+        /// <summary>
+        /// Save calendar infos
+        /// </summary>
+        /// <param name="calendar">The edited caledanr</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult EditCalendar(ECalendar calendar)
         {
@@ -55,6 +65,11 @@ namespace EventCalendar.Controllers
             return RedirectToAction("Index", new { id = calendar.Id });
         }
 
+        /// <summary>
+        /// Shows all normal events from a specific calendar
+        /// </summary>
+        /// <param name="id">The calendar id</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult ShowEvents(int id)
         {
@@ -64,6 +79,11 @@ namespace EventCalendar.Controllers
             return PartialView(events);
         }
 
+        /// <summary>
+        /// Shows all recurring events from a specific calendar
+        /// </summary>
+        /// <param name="id">The calendar id</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult ShowRecurringEvents(int id)
         {
@@ -134,6 +154,11 @@ namespace EventCalendar.Controllers
             return RedirectToAction("Index", new { id = cal.Id });
         }
 
+        /// <summary>
+        /// Get a normal event for editing
+        /// </summary>
+        /// <param name="id">The event id</param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult EditEventForm(int id = 0)
         {
@@ -160,12 +185,12 @@ namespace EventCalendar.Controllers
                 eem.end = (DateTime)entry.end;
             }
             //Get Descriptions for Event
-            Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0",id).ToDictionary(x => x.CultureCode);
+            Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0 AND type = @1 AND calendarid = @2",id, 0, entry.calendarId).ToDictionary(x => x.CultureCode);
             List<ILanguage> languages = Services.LocalizationService.GetAllLanguages().ToList();
             foreach (var lang in languages)
             {
                 if(!descriptions.ContainsKey(lang.CultureInfo.ToString())){
-                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = eem.Id, Id = 0 });
+                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = eem.Id, Id = 0, CalendarId = entry.calendarId, Type = (int)EventType.Normal });
                 }
             }
 
@@ -174,6 +199,11 @@ namespace EventCalendar.Controllers
             return PartialView("EditEventForm",eem);
         }
 
+        /// <summary>
+        /// Saves an edited event
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult EditEventForm(EditEventModel e)
         {
@@ -190,7 +220,7 @@ namespace EventCalendar.Controllers
             {
                 if (!descriptions.ContainsKey(lang.CultureInfo.ToString()))
                 {
-                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = e.Id, Id = 0 });
+                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = e.Id, Id = 0, Type = (int)EventType.Normal, CalendarId = e.calendarId });
                 }
             }
 
@@ -217,6 +247,12 @@ namespace EventCalendar.Controllers
             return PartialView("EditEventForm",e);
         }
 
+        /// <summary>
+        /// Get a recurring event for editing
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
         public ActionResult EditRecurringEvent(int id = 0)
         {
             List<EventLocation> locations = this._db.Query<EventLocation>("SELECT * FROM ec_locations").ToList();
@@ -229,7 +265,6 @@ namespace EventCalendar.Controllers
 
             EditRecurringEventModel ere = new EditRecurringEventModel(){
                 title = e.title,
-                description = e.description,
                 allDay = e.allDay,
                 id = e.Id,
                 day = (DayOfWeekEnum)e.day,
@@ -240,9 +275,26 @@ namespace EventCalendar.Controllers
                 selectedLocation = e.locationId
             };
 
+            //Get Descriptions for Event
+            Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0 AND type = 1 AND calendarid = @1", id, e.calendarId).ToDictionary(x => x.CultureCode);
+            List<ILanguage> languages = Services.LocalizationService.GetAllLanguages().ToList();
+            foreach (var lang in languages)
+            {
+                if (!descriptions.ContainsKey(lang.CultureInfo.ToString()))
+                {
+                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = ere.id, Id = 0,Type = (int)EventType.Recurring, CalendarId = ere.calendar });
+                }
+            }
+            ere.Descriptions = descriptions;
+
             return PartialView(ere);
         }
 
+        /// <summary>
+        /// Saves the edited event
+        /// </summary>
+        /// <param name="ere"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult EditRecurringEvent(EditRecurringEventModel ere)
         {
@@ -266,7 +318,7 @@ namespace EventCalendar.Controllers
                 allDay = ere.allDay,
                 calendarId = ere.calendar,
                 locationId = ere.selectedLocation,
-                description = ere.description,
+                description = String.Empty,
                 day = (int)ere.day,
                 frequency = (int)ere.frequency,
                 monthly_interval = (int)ere.monthly
@@ -274,9 +326,28 @@ namespace EventCalendar.Controllers
 
             _db.Update(re, re.Id);
 
+            //Get Descriptions for Event
+            Dictionary<string, EventDesciption> descriptions = this._db.Query<EventDesciption>("SELECT * FROM ec_eventdescriptions WHERE eventid = @0", ere.id).ToDictionary(x => x.CultureCode);
+            List<ILanguage> languages = Services.LocalizationService.GetAllLanguages().ToList();
+            foreach (var lang in languages)
+            {
+                if (!descriptions.ContainsKey(lang.CultureInfo.ToString()))
+                {
+                    descriptions.Add(lang.CultureInfo.ToString(), new EventDesciption() { CultureCode = lang.CultureInfo.ToString(), EventId = ere.id, Id = 0, Type = (int)EventType.Recurring, CalendarId = ere.calendar });
+                }
+            }
+            ere.Descriptions = descriptions;
+
             return PartialView(ere);
         }
 
+        /// <summary>
+        /// Gets all events for the calendar view
+        /// </summary>
+        /// <param name="id">A specific calendar id</param>
+        /// <param name="start">A specific start date/time</param>
+        /// <param name="end">A specific end date/time</param>
+        /// <returns>A Json string containing all found events</returns>
         [HttpPost]
         public string GetCalendarEventsAsJson(int id = 0, int start = 0, int end = 0)
         {
@@ -358,7 +429,9 @@ namespace EventCalendar.Controllers
             {
                 Content = edm.content,
                 CultureCode = edm.culture,
-                EventId = edm.eventid
+                EventId = edm.eventid,
+                CalendarId = edm.calendarid,
+                Type = edm.type
             };
             if (edm.id != 0)
             {
@@ -371,6 +444,30 @@ namespace EventCalendar.Controllers
             }
             
             return RedirectToAction("EditEventForm", new { id = edm.eventid });
+        }
+
+        [HttpPost]
+        public ActionResult SaveRecEventDescription(EditDescriptionModel edm)
+        {
+            EventDesciption ed = new EventDesciption()
+            {
+                Content = edm.content,
+                CultureCode = edm.culture,
+                EventId = edm.eventid,
+                CalendarId = edm.calendarid,
+                Type = edm.type
+            };
+            if (edm.id != 0)
+            {
+                ed.Id = edm.id;
+                this._db.Update(ed);
+            }
+            else
+            {
+                this._db.Insert(ed);
+            }
+
+            return RedirectToAction("EditRecurringEvent", new { id = edm.eventid });
         }
 
         private List<EventsOverviewModel> GetNormalEvents(int id)
@@ -391,7 +488,8 @@ namespace EventCalendar.Controllers
                         end = ne.end,
                         start = ne.start,
                         id = ne.Id,
-                        color = !String.IsNullOrEmpty(calendar.Color) ? calendar.Color : ""
+                        color = !String.IsNullOrEmpty(calendar.Color) ? calendar.Color : "",
+                        calendar = ne.calendarId
                     });
             }
             return events;
@@ -433,7 +531,8 @@ namespace EventCalendar.Controllers
                         description = e.description,
                         start = tmp,
                         type = EventType.Recurring,
-                        color = !String.IsNullOrEmpty(calendar.Color) ? calendar.Color : ""
+                        color = !String.IsNullOrEmpty(calendar.Color) ? calendar.Color : "",
+                        calendar = e.calendarId
                     });
                 }
             }
