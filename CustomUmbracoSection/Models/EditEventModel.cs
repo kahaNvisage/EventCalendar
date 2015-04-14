@@ -20,7 +20,7 @@ namespace EventCalendar.Models
 
         [Required]
         [Display(Name = "Title")]
-        [StringLength(50)]
+        [StringLength(100)]
         public string title { get; set; }
 
         [Required]
